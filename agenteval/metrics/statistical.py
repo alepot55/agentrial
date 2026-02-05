@@ -253,3 +253,111 @@ def compare_distributions(
         "baseline_median": baseline_median,
         "median_delta": current_median - baseline_median,
     }
+
+
+def benjamini_hochberg_correction(
+    p_values: list[float],
+    alpha: float = 0.05,
+) -> tuple[list[bool], list[float]]:
+    """Apply Benjamini-Hochberg FDR correction for multiple testing.
+
+    When comparing multiple metrics simultaneously (e.g., pass rate, cost,
+    latency), the probability of false positives increases. This correction
+    controls the False Discovery Rate (FDR) - the expected proportion of
+    false positives among all rejected hypotheses.
+
+    Args:
+        p_values: List of p-values from individual tests.
+        alpha: Desired FDR level (default 0.05).
+
+    Returns:
+        Tuple of:
+        - List of booleans indicating which tests are significant
+        - List of adjusted p-values
+
+    Reference:
+        Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery
+        rate: a practical and powerful approach to multiple testing.
+    """
+    if not p_values:
+        return [], []
+
+    n = len(p_values)
+
+    # Create (index, p_value) pairs and sort by p_value
+    indexed_pvalues = sorted(enumerate(p_values), key=lambda x: x[1])
+
+    # Calculate adjusted p-values
+    adjusted = [0.0] * n
+    significant = [False] * n
+
+    # Process from largest to smallest p-value
+    min_so_far = 1.0
+    for rank, (original_idx, p) in enumerate(reversed(indexed_pvalues)):
+        # Adjusted p = p * n / (n - rank) = p * n / actual_rank
+        actual_rank = n - rank
+        adj_p = min(p * n / actual_rank, 1.0)
+        # Ensure monotonicity
+        adj_p = min(adj_p, min_so_far)
+        min_so_far = adj_p
+        adjusted[original_idx] = adj_p
+
+    # Determine significance
+    # Find largest rank k where p_(k) <= k/n * alpha
+    max_significant_rank = 0
+    for rank, (original_idx, p) in enumerate(indexed_pvalues, 1):
+        threshold = rank / n * alpha
+        if p <= threshold:
+            max_significant_rank = rank
+
+    # Mark all tests with rank <= max_significant_rank as significant
+    for rank, (original_idx, _) in enumerate(indexed_pvalues, 1):
+        if rank <= max_significant_rank:
+            significant[original_idx] = True
+
+    return significant, adjusted
+
+
+def compare_multiple_metrics(
+    comparisons: list[dict[str, float]],
+    alpha: float = 0.05,
+) -> dict[str, any]:
+    """Compare multiple metrics with FDR correction.
+
+    When comparing current run to baseline across multiple metrics
+    (pass rate, cost, latency), this function applies Benjamini-Hochberg
+    correction to control the false discovery rate.
+
+    Args:
+        comparisons: List of dicts, each with 'name' and 'p_value' keys.
+        alpha: Desired FDR level.
+
+    Returns:
+        Dictionary with:
+        - results: List of comparison results with adjusted p-values
+        - any_significant: Whether any metric shows significant change
+        - n_significant: Number of significant changes
+    """
+    if not comparisons:
+        return {
+            "results": [],
+            "any_significant": False,
+            "n_significant": 0,
+        }
+
+    p_values = [c["p_value"] for c in comparisons]
+    significant, adjusted = benjamini_hochberg_correction(p_values, alpha)
+
+    results = []
+    for i, comp in enumerate(comparisons):
+        results.append({
+            **comp,
+            "adjusted_p_value": adjusted[i],
+            "significant_after_correction": significant[i],
+        })
+
+    return {
+        "results": results,
+        "any_significant": any(significant),
+        "n_significant": sum(significant),
+    }

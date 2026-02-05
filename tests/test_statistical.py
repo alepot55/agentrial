@@ -3,7 +3,9 @@
 import pytest
 
 from agenteval.metrics.statistical import (
+    benjamini_hochberg_correction,
     bootstrap_confidence_interval,
+    compare_multiple_metrics,
     detect_regression,
     fisher_exact_test,
     mann_whitney_u_test,
@@ -148,3 +150,117 @@ class TestDetectRegression:
         result = detect_regression(9, 10, 2, 10)
         assert not result["is_regression"]
         assert result["rate_delta"] > 0
+
+
+class TestBenjaminiHochbergCorrection:
+    """Tests for Benjamini-Hochberg FDR correction."""
+
+    def test_empty_pvalues(self) -> None:
+        """Test with empty p-value list."""
+        significant, adjusted = benjamini_hochberg_correction([])
+        assert significant == []
+        assert adjusted == []
+
+    def test_single_pvalue_significant(self) -> None:
+        """Test single significant p-value."""
+        significant, adjusted = benjamini_hochberg_correction([0.01], alpha=0.05)
+        assert significant == [True]
+        assert adjusted[0] == pytest.approx(0.01)
+
+    def test_single_pvalue_not_significant(self) -> None:
+        """Test single non-significant p-value."""
+        significant, adjusted = benjamini_hochberg_correction([0.10], alpha=0.05)
+        assert significant == [False]
+        assert adjusted[0] == pytest.approx(0.10)
+
+    def test_multiple_all_significant(self) -> None:
+        """Test multiple p-values all below threshold."""
+        p_values = [0.001, 0.002, 0.003]
+        significant, adjusted = benjamini_hochberg_correction(p_values, alpha=0.05)
+        assert all(significant)
+        # Adjusted p-values should be larger than originals
+        for orig, adj in zip(p_values, adjusted):
+            assert adj >= orig
+
+    def test_multiple_none_significant(self) -> None:
+        """Test multiple p-values all above threshold."""
+        p_values = [0.20, 0.30, 0.40]
+        significant, adjusted = benjamini_hochberg_correction(p_values, alpha=0.05)
+        assert not any(significant)
+
+    def test_multiple_mixed(self) -> None:
+        """Test with mixed significant/non-significant p-values."""
+        # p1=0.01, p2=0.04, p3=0.10
+        # Sorted: 0.01, 0.04, 0.10
+        # Thresholds: 0.0167, 0.0333, 0.05
+        # p1 < 0.0167: sig, p2 > 0.0333: not sig
+        p_values = [0.01, 0.04, 0.10]
+        significant, adjusted = benjamini_hochberg_correction(p_values, alpha=0.05)
+        assert significant[0]  # 0.01 is significant
+        assert not significant[2]  # 0.10 is not significant
+
+    def test_adjusted_pvalues_monotonic(self) -> None:
+        """Test that adjusted p-values are monotonic in sorted order."""
+        p_values = [0.01, 0.03, 0.02, 0.05]
+        significant, adjusted = benjamini_hochberg_correction(p_values, alpha=0.05)
+        # When sorted by original p-value, adjusted should be monotonically increasing
+        sorted_indices = sorted(range(len(p_values)), key=lambda i: p_values[i])
+        sorted_adjusted = [adjusted[i] for i in sorted_indices]
+        for i in range(len(sorted_adjusted) - 1):
+            assert sorted_adjusted[i] <= sorted_adjusted[i + 1]
+
+
+class TestCompareMultipleMetrics:
+    """Tests for comparing multiple metrics with FDR correction."""
+
+    def test_empty_comparisons(self) -> None:
+        """Test with empty comparisons."""
+        result = compare_multiple_metrics([])
+        assert result["results"] == []
+        assert not result["any_significant"]
+        assert result["n_significant"] == 0
+
+    def test_all_significant(self) -> None:
+        """Test when all metrics show significant change."""
+        comparisons = [
+            {"name": "pass_rate", "p_value": 0.001},
+            {"name": "cost", "p_value": 0.002},
+            {"name": "latency", "p_value": 0.003},
+        ]
+        result = compare_multiple_metrics(comparisons, alpha=0.05)
+        assert result["any_significant"]
+        assert result["n_significant"] == 3
+        # All should remain significant after correction
+        for r in result["results"]:
+            assert r["significant_after_correction"]
+
+    def test_none_significant(self) -> None:
+        """Test when no metrics show significant change."""
+        comparisons = [
+            {"name": "pass_rate", "p_value": 0.20},
+            {"name": "cost", "p_value": 0.30},
+            {"name": "latency", "p_value": 0.40},
+        ]
+        result = compare_multiple_metrics(comparisons, alpha=0.05)
+        assert not result["any_significant"]
+        assert result["n_significant"] == 0
+
+    def test_some_significant(self) -> None:
+        """Test with some significant, some not."""
+        comparisons = [
+            {"name": "pass_rate", "p_value": 0.001},  # Clearly significant
+            {"name": "cost", "p_value": 0.50},  # Not significant
+            {"name": "latency", "p_value": 0.60},  # Not significant
+        ]
+        result = compare_multiple_metrics(comparisons, alpha=0.05)
+        assert result["any_significant"]
+        assert result["n_significant"] >= 1
+
+    def test_adjusted_pvalues_included(self) -> None:
+        """Test that adjusted p-values are included in results."""
+        comparisons = [
+            {"name": "pass_rate", "p_value": 0.01},
+        ]
+        result = compare_multiple_metrics(comparisons, alpha=0.05)
+        assert "adjusted_p_value" in result["results"][0]
+        assert "significant_after_correction" in result["results"][0]
