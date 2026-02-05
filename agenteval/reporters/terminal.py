@@ -105,36 +105,84 @@ def print_results(suite_result: SuiteResult, verbose: bool = False) -> None:
 def _print_failure_attribution(suite_result: SuiteResult, verbose: bool = False) -> None:
     """Print failure attribution details.
 
+    For tests with mixed results (some pass, some fail): shows Fisher test attribution.
+    For tests with 0% pass rate: shows aggregated failure reasons.
+    For tests with partial failures: shows basic failure summary.
+
     Args:
         suite_result: The suite result to analyze.
         verbose: If True, show additional details.
     """
-    printed_any = False
+    from collections import Counter
 
     for result in suite_result.results:
-        if result.pass_rate < 1.0:  # Only show attribution for tests with failures
-            if result.failure_attribution and result.failure_attribution.get("most_likely_step") is not None:
-                printed_any = True
-                console.print(f"\n[bold yellow]Failure Analysis: {result.test_case.name}[/bold yellow]")
-                console.print(f"  {result.failure_attribution.get('recommendation', 'No recommendation')}")
+        if result.pass_rate >= 1.0:
+            continue  # Skip tests with no failures
 
-                # Print failure patterns in verbose mode
-                if verbose:
-                    patterns = result.failure_attribution.get("failure_patterns", [])
-                    if patterns:
-                        console.print("  [bold]Common failures:[/bold]")
-                        for pattern in patterns[:3]:
-                            msg = pattern['message'][:80]
-                            console.print(f"    - {msg}... ({pattern['count']} occurrences)")
-            elif result.pass_rate < 1.0:
-                # Test failed but no attribution - still show basic info
-                printed_any = True
-                failed_count = sum(1 for t in result.trials if not t.passed)
-                console.print(f"\n[bold yellow]Failures: {result.test_case.name}[/bold yellow]")
-                console.print(f"  {failed_count}/{len(result.trials)} trials failed")
+        failed_count = sum(1 for t in result.trials if not t.passed)
+        total_count = len(result.trials)
+        pass_rate_pct = format_percentage(result.pass_rate)
 
-    if not printed_any and verbose:
-        console.print("[dim]No significant failure patterns detected.[/dim]")
+        console.print(f"\n[bold yellow]Failures: {result.test_case.name}[/bold yellow] ({pass_rate_pct} pass rate)")
+
+        # If we have Fisher test attribution (mixed results), show it
+        if result.failure_attribution and result.failure_attribution.get("most_likely_step") is not None:
+            recommendation = result.failure_attribution.get("recommendation", "")
+            if recommendation:
+                console.print(f"  [dim]Analysis:[/dim] {recommendation}")
+
+        # Aggregate failure reasons across all failed trials
+        failure_counter: Counter[str] = Counter()
+        wrong_tool_counter: Counter[str] = Counter()
+        expected_tools: set[str] = set()
+
+        # Get expected tools from test case
+        if result.test_case.expected and result.test_case.expected.tool_calls:
+            for tc in result.test_case.expected.tool_calls:
+                if isinstance(tc, dict) and "tool" in tc:
+                    expected_tools.add(tc["tool"])
+
+        for trial in result.trials:
+            if not trial.passed:
+                for failure in trial.failures:
+                    # Truncate long failure messages for counting
+                    failure_key = failure[:100] if len(failure) > 100 else failure
+                    failure_counter[failure_key] += 1
+
+                    # Check for wrong tool usage
+                    if expected_tools and trial.agent_output and trial.agent_output.steps:
+                        actual_tools = {
+                            s.name for s in trial.agent_output.steps
+                            if s.step_type.value == "tool_call"
+                        }
+                        for tool in actual_tools:
+                            if tool not in expected_tools and tool != "unknown_tool":
+                                wrong_tool_counter[tool] += 1
+
+        # Show most common failure reasons
+        if failure_counter:
+            console.print(f"  [bold]Most common failures:[/bold] ({failed_count}/{total_count} trials)")
+            for failure_msg, count in failure_counter.most_common(3):
+                # Truncate for display
+                display_msg = failure_msg[:70] + "..." if len(failure_msg) > 70 else failure_msg
+                console.print(f"    - {display_msg} ({count}x)")
+
+        # Show wrong tool usage if detected
+        if wrong_tool_counter and expected_tools:
+            console.print(f"  [bold]Wrong tool called:[/bold]")
+            for wrong_tool, count in wrong_tool_counter.most_common(2):
+                expected_str = ", ".join(sorted(expected_tools))
+                console.print(f"    - '{wrong_tool}' instead of expected '{expected_str}' ({count}x)")
+
+        # In verbose mode, show additional patterns
+        if verbose and result.failure_attribution:
+            patterns = result.failure_attribution.get("failure_patterns", [])
+            if patterns:
+                console.print("  [bold]Failure patterns from trajectory analysis:[/bold]")
+                for pattern in patterns[:3]:
+                    msg = pattern.get("message", "")[:60]
+                    count = pattern.get("count", 0)
+                    console.print(f"    - {msg}... ({count} occurrences)")
 
 
 def print_eval_result(result: EvalResult, verbose: bool = False) -> None:

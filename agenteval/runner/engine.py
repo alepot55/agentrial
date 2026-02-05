@@ -85,6 +85,8 @@ class MultiTrialEngine:
         self.show_progress = show_progress
         self._progress: Progress | None = None
         self._current_task_id: int | None = None
+        self._current_test_index: int = 0
+        self._total_tests: int = 0
 
     def run_single_trial(
         self,
@@ -186,10 +188,12 @@ class MultiTrialEngine:
             trials.append(trial)
             # Update progress bar if active
             if self._progress is not None and self._current_task_id is not None:
+                # Format: [test 3/10] test-name trial 5/10
+                test_progress = f"[test {self._current_test_index}/{self._total_tests}]" if self._total_tests > 0 else ""
                 self._progress.update(
                     self._current_task_id,
                     advance=1,
-                    description=f"[{test_case.name}] trial {i + 1}/{self.trials}",
+                    description=f"{test_progress} {test_case.name} trial {i + 1}/{self.trials}",
                 )
 
         # Compute basic metrics
@@ -254,16 +258,20 @@ class MultiTrialEngine:
                 transient=True,
             ) as progress:
                 self._progress = progress
+                self._total_tests = len(suite.cases)
                 self._current_task_id = progress.add_task(
                     f"Running {suite.name}",
                     total=total_trials,
                 )
-                for test_case in suite.cases:
+                for idx, test_case in enumerate(suite.cases):
+                    self._current_test_index = idx + 1
                     logger.info("Evaluating test case: %s", test_case.name)
                     result = self.run_test_case(agent, test_case)
                     results.append(result)
                 self._progress = None
                 self._current_task_id = None
+                self._current_test_index = 0
+                self._total_tests = 0
         else:
             for test_case in suite.cases:
                 logger.info("Evaluating test case: %s", test_case.name)
