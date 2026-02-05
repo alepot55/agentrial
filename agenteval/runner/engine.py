@@ -122,7 +122,12 @@ class MultiTrialEngine:
 
         duration_ms = (time.time() - start_time) * 1000
 
-        # Evaluate output if expectations exist
+        # Check if agent reported failure
+        if not output.success:
+            error_msg = output.error or "Agent returned success=False"
+            failures.append(f"Agent failed: {error_msg}")
+
+        # Evaluate output if expectations exist and agent succeeded
         if output.success and test_case.expected:
             output_failures = evaluate_output(output, test_case.expected)
             failures.extend(output_failures)
