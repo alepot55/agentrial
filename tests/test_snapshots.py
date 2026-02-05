@@ -1,12 +1,10 @@
 """Tests for snapshot testing."""
 
-import json
 import tempfile
 from pathlib import Path
 
 from agentrial.snapshots import (
     CaseComparison,
-    SnapshotComparison,
     compare_with_snapshot,
     create_snapshot,
     load_snapshot,
