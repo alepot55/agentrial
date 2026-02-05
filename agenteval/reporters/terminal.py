@@ -62,7 +62,7 @@ def print_results(suite_result: SuiteResult, verbose: bool = False) -> None:
 
     # Create results table
     table = Table(show_header=True, header_style="bold")
-    table.add_column("Test Case", style="cyan")
+    table.add_column("Test Case", style="cyan", min_width=30, no_wrap=True)
     table.add_column("Pass Rate", justify="right")
     table.add_column("95% CI", justify="right")
     table.add_column("Avg Cost", justify="right")
@@ -170,7 +170,7 @@ def print_comparison(
     console.print(Panel("[bold]Comparison with Baseline[/bold]"))
 
     table = Table(show_header=True, header_style="bold")
-    table.add_column("Test Case")
+    table.add_column("Test Case", min_width=30, no_wrap=True)
     table.add_column("Current", justify="right")
     table.add_column("Baseline", justify="right")
     table.add_column("Delta", justify="right")
