@@ -1,0 +1,23 @@
+# Example AgentEval workflow - copy this to your project
+# Save as .github/workflows/agenteval.yml in your repository
+
+name: AgentEval
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: agenteval/agenteval@v1
+        with:
+          trials: 10
+          threshold: 0.9
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
