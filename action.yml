@@ -1,6 +1,6 @@
-name: 'AgentEval'
+name: 'Agentrial'
 description: 'Statistical evaluation for AI agents - test your agents with confidence intervals and failure attribution'
-author: 'AgentEval Team'
+author: 'Alessandro Potenza'
 
 branding:
   icon: 'check-circle'
