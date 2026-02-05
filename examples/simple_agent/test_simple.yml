@@ -1,0 +1,41 @@
+# Example test suite for simple_qa_agent
+suite: simple-qa-tests
+agent: examples.simple_agent.simple_qa_agent
+trials: 5
+threshold: 0.8
+
+cases:
+  - name: greeting-response
+    input:
+      query: "Hello, how are you?"
+    expected:
+      output_contains:
+        - "Hello"
+        - "help"
+
+  - name: weather-query
+    input:
+      query: "What's the weather like today?"
+    expected:
+      output_contains:
+        - "weather"
+      tool_calls:
+        - tool: search
+          params_contain:
+            query: "What's the weather like today?"
+
+  - name: flight-search
+    input:
+      query: "Find me a flight to Tokyo"
+    expected:
+      output_contains:
+        - "flight"
+      tool_calls:
+        - tool: search
+
+  - name: help-request
+    input:
+      query: "Can you help me?"
+    expected:
+      output_contains:
+        - "help"

@@ -1,0 +1,275 @@
+"""Multi-trial execution engine."""
+
+import importlib
+import logging
+import time
+from typing import Any, Callable, Protocol
+
+from agenteval.evaluators.step_eval import evaluate_output, evaluate_step
+from agenteval.metrics.basic import compute_basic_metrics
+from agenteval.metrics.statistical import (
+    bootstrap_confidence_interval,
+    wilson_confidence_interval,
+)
+from agenteval.metrics.trajectory import attribute_failures
+from agenteval.types import (
+    AgentInput,
+    AgentOutput,
+    ConfidenceInterval,
+    EvalResult,
+    Suite,
+    SuiteResult,
+    TestCase,
+    TrialResult,
+)
+
+logger = logging.getLogger(__name__)
+
+
+class AgentProtocol(Protocol):
+    """Protocol for agent callables."""
+
+    def __call__(self, input: AgentInput) -> AgentOutput: ...
+
+
+def load_agent(agent_path: str) -> Callable[[AgentInput], AgentOutput]:
+    """Load an agent function from a Python import path.
+
+    Args:
+        agent_path: Dotted import path (e.g., "my_agent.flight_search").
+
+    Returns:
+        The agent callable.
+
+    Raises:
+        ImportError: If the module or function cannot be found.
+    """
+    parts = agent_path.rsplit(".", 1)
+    if len(parts) == 1:
+        raise ImportError(f"Invalid agent path: {agent_path}. Expected 'module.function'")
+
+    module_path, func_name = parts
+    module = importlib.import_module(module_path)
+    agent = getattr(module, func_name, None)
+
+    if agent is None:
+        raise ImportError(f"Function '{func_name}' not found in module '{module_path}'")
+
+    return agent
+
+
+class MultiTrialEngine:
+    """Engine for running multiple trials of agent evaluation.
+
+    This is the core execution engine that runs an agent multiple times
+    for each test case and collects results.
+    """
+
+    def __init__(
+        self,
+        trials: int = 10,
+        parallel: int = 1,
+    ) -> None:
+        """Initialize the engine.
+
+        Args:
+            trials: Number of trials per test case.
+            parallel: Number of parallel workers (not implemented in MVP).
+        """
+        self.trials = trials
+        self.parallel = parallel
+
+    def run_single_trial(
+        self,
+        agent: Callable[[AgentInput], AgentOutput],
+        test_case: TestCase,
+        trial_index: int,
+    ) -> TrialResult:
+        """Run a single trial of a test case.
+
+        Args:
+            agent: The agent callable.
+            test_case: The test case to run.
+            trial_index: Index of this trial (0-based).
+
+        Returns:
+            TrialResult with pass/fail and metrics.
+        """
+        start_time = time.time()
+        failures: list[str] = []
+
+        try:
+            output = agent(test_case.input)
+        except Exception as e:
+            logger.warning("Agent raised exception in trial %d: %s", trial_index, e)
+            from agenteval.types import AgentMetadata
+
+            output = AgentOutput(
+                output="",
+                steps=[],
+                metadata=AgentMetadata(),
+                success=False,
+                error=str(e),
+            )
+            failures.append(f"Agent exception: {e}")
+
+        duration_ms = (time.time() - start_time) * 1000
+
+        # Evaluate output if expectations exist
+        if output.success and test_case.expected:
+            output_failures = evaluate_output(output, test_case.expected)
+            failures.extend(output_failures)
+
+        # Evaluate step expectations
+        for step_exp in test_case.step_expectations:
+            if step_exp.step_index is not None and step_exp.step_index < len(output.steps):
+                step = output.steps[step_exp.step_index]
+                step_failures = evaluate_step(step, step_exp)
+                failures.extend(step_failures)
+
+        # Check cost constraint
+        if test_case.max_cost is not None and output.metadata.cost > test_case.max_cost:
+            failures.append(
+                f"Cost {output.metadata.cost:.4f} exceeds max {test_case.max_cost:.4f}"
+            )
+
+        # Check latency constraint
+        if test_case.max_latency_ms is not None and duration_ms > test_case.max_latency_ms:
+            failures.append(
+                f"Latency {duration_ms:.0f}ms exceeds max {test_case.max_latency_ms:.0f}ms"
+            )
+
+        passed = len(failures) == 0
+
+        return TrialResult(
+            trial_index=trial_index,
+            test_case=test_case,
+            agent_output=output,
+            passed=passed,
+            failures=failures,
+            duration_ms=duration_ms,
+            cost=output.metadata.cost,
+            tokens=output.metadata.total_tokens,
+        )
+
+    def run_test_case(
+        self,
+        agent: Callable[[AgentInput], AgentOutput],
+        test_case: TestCase,
+    ) -> EvalResult:
+        """Run all trials for a test case and compute statistics.
+
+        Args:
+            agent: The agent callable.
+            test_case: The test case to evaluate.
+
+        Returns:
+            EvalResult with pass rate, CI, and metrics.
+        """
+        trials: list[TrialResult] = []
+
+        for i in range(self.trials):
+            logger.debug("Running trial %d/%d for %s", i + 1, self.trials, test_case.name)
+            trial = self.run_single_trial(agent, test_case, i)
+            trials.append(trial)
+
+        # Compute basic metrics
+        metrics = compute_basic_metrics(trials)
+
+        # Compute pass rate and CI
+        successes = sum(1 for t in trials if t.passed)
+        pass_rate = successes / len(trials)
+        pass_rate_ci = wilson_confidence_interval(successes, len(trials))
+
+        # Compute cost CI via bootstrap
+        costs = [t.cost for t in trials]
+        cost_ci = bootstrap_confidence_interval(costs)
+
+        # Compute latency CI via bootstrap
+        latencies = [t.duration_ms for t in trials]
+        latency_ci = bootstrap_confidence_interval(latencies)
+
+        # Attribute failures if any
+        failure_attribution = None
+        if successes < len(trials):
+            failure_attribution = attribute_failures(trials)
+
+        return EvalResult(
+            test_case=test_case,
+            trials=trials,
+            pass_rate=pass_rate,
+            pass_rate_ci=pass_rate_ci,
+            mean_cost=metrics["mean_cost"],
+            cost_ci=cost_ci,
+            mean_latency_ms=metrics["mean_latency_ms"],
+            latency_ci=latency_ci,
+            mean_tokens=metrics["mean_tokens"],
+            failure_attribution=failure_attribution,
+        )
+
+    def run_suite(
+        self,
+        agent: Callable[[AgentInput], AgentOutput],
+        suite: Suite,
+    ) -> SuiteResult:
+        """Run all test cases in a suite.
+
+        Args:
+            agent: The agent callable.
+            suite: The test suite to run.
+
+        Returns:
+            SuiteResult with all results and overall metrics.
+        """
+        start_time = time.time()
+        results: list[EvalResult] = []
+
+        for test_case in suite.cases:
+            logger.info("Evaluating test case: %s", test_case.name)
+            result = self.run_test_case(agent, test_case)
+            results.append(result)
+
+        total_duration_ms = (time.time() - start_time) * 1000
+        total_cost = sum(r.mean_cost * len(r.trials) for r in results)
+
+        # Compute overall pass rate
+        total_trials = sum(len(r.trials) for r in results)
+        total_passed = sum(sum(1 for t in r.trials if t.passed) for r in results)
+        overall_pass_rate = total_passed / total_trials if total_trials > 0 else 0.0
+        overall_ci = wilson_confidence_interval(total_passed, total_trials)
+
+        passed = overall_pass_rate >= suite.threshold
+
+        return SuiteResult(
+            suite=suite,
+            results=results,
+            overall_pass_rate=overall_pass_rate,
+            overall_pass_rate_ci=overall_ci,
+            total_cost=total_cost,
+            total_duration_ms=total_duration_ms,
+            passed=passed,
+        )
+
+
+def run_suite(
+    suite: Suite,
+    trials: int | None = None,
+    parallel: int = 1,
+) -> SuiteResult:
+    """Convenience function to run a test suite.
+
+    Args:
+        suite: The test suite to run.
+        trials: Override number of trials (uses suite default if None).
+        parallel: Number of parallel workers.
+
+    Returns:
+        SuiteResult with all results.
+    """
+    effective_trials = trials if trials is not None else suite.trials
+    engine = MultiTrialEngine(trials=effective_trials, parallel=parallel)
+
+    # Load the agent
+    agent = load_agent(suite.agent)
+
+    return engine.run_suite(agent, suite)
