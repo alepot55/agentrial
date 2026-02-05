@@ -158,7 +158,8 @@ def run(
             suite.threshold = threshold
 
         # Create engine and run
-        engine = MultiTrialEngine(trials=effective_trials)
+        # Disable progress bar for JSON output to avoid interfering with stdout
+        engine = MultiTrialEngine(trials=effective_trials, show_progress=not json_output)
 
         # Ensure cwd is in path for agent imports
         _ensure_cwd_in_path()

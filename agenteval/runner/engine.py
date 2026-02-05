@@ -5,6 +5,8 @@ import logging
 import time
 from typing import Any, Callable, Protocol
 
+from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn, TimeElapsedColumn
+
 from agenteval.evaluators.step_eval import evaluate_output, evaluate_step
 from agenteval.metrics.basic import compute_basic_metrics
 from agenteval.metrics.statistical import (
@@ -69,15 +71,20 @@ class MultiTrialEngine:
         self,
         trials: int = 10,
         parallel: int = 1,
+        show_progress: bool = True,
     ) -> None:
         """Initialize the engine.
 
         Args:
             trials: Number of trials per test case.
             parallel: Number of parallel workers (not implemented in MVP).
+            show_progress: Whether to show progress bars during execution.
         """
         self.trials = trials
         self.parallel = parallel
+        self.show_progress = show_progress
+        self._progress: Progress | None = None
+        self._current_task_id: int | None = None
 
     def run_single_trial(
         self,
@@ -172,6 +179,13 @@ class MultiTrialEngine:
             logger.debug("Running trial %d/%d for %s", i + 1, self.trials, test_case.name)
             trial = self.run_single_trial(agent, test_case, i)
             trials.append(trial)
+            # Update progress bar if active
+            if self._progress is not None and self._current_task_id is not None:
+                self._progress.update(
+                    self._current_task_id,
+                    advance=1,
+                    description=f"[{test_case.name}] trial {i + 1}/{self.trials}",
+                )
 
         # Compute basic metrics
         metrics = compute_basic_metrics(trials)
@@ -224,10 +238,32 @@ class MultiTrialEngine:
         start_time = time.time()
         results: list[EvalResult] = []
 
-        for test_case in suite.cases:
-            logger.info("Evaluating test case: %s", test_case.name)
-            result = self.run_test_case(agent, test_case)
-            results.append(result)
+        total_trials = len(suite.cases) * self.trials
+
+        if self.show_progress:
+            with Progress(
+                TextColumn("[bold blue]{task.description}"),
+                BarColumn(),
+                TaskProgressColumn(),
+                TimeElapsedColumn(),
+                transient=True,
+            ) as progress:
+                self._progress = progress
+                self._current_task_id = progress.add_task(
+                    f"Running {suite.name}",
+                    total=total_trials,
+                )
+                for test_case in suite.cases:
+                    logger.info("Evaluating test case: %s", test_case.name)
+                    result = self.run_test_case(agent, test_case)
+                    results.append(result)
+                self._progress = None
+                self._current_task_id = None
+        else:
+            for test_case in suite.cases:
+                logger.info("Evaluating test case: %s", test_case.name)
+                result = self.run_test_case(agent, test_case)
+                results.append(result)
 
         total_duration_ms = (time.time() - start_time) * 1000
         total_cost = sum(r.mean_cost * len(r.trials) for r in results)
