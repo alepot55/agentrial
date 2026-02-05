@@ -91,6 +91,17 @@ def main(ctx: click.Context, verbose: bool) -> None:
     is_flag=True,
     help="Output results as JSON to stdout",
 )
+@click.option(
+    "--flamegraph",
+    is_flag=True,
+    help="Show trajectory flame graph for each test case",
+)
+@click.option(
+    "--html",
+    "html_path",
+    type=click.Path(),
+    help="Export flame graph as HTML file",
+)
 @click.pass_context
 def run(
     ctx: click.Context,
@@ -100,6 +111,8 @@ def run(
     threshold: float | None,
     output_path: str | None,
     json_output: bool,
+    flamegraph: bool,
+    html_path: str | None,
 ) -> None:
     """Run evaluation suite(s).
 
@@ -216,6 +229,20 @@ def run(
             print(json.dumps(export_json(suite_result), indent=2))
         else:
             print_results(suite_result, verbose=verbose)
+
+        # Show flame graph if requested
+        if flamegraph and not json_output:
+            from agentrial.reporters.flamegraph import print_suite_flamegraphs
+
+            print_suite_flamegraphs(suite_result, console)
+
+        # Export HTML flame graph if requested
+        if html_path:
+            from agentrial.reporters.flamegraph import export_suite_flamegraphs_html
+
+            html_content = export_suite_flamegraphs_html(suite_result)
+            Path(html_path).write_text(html_content)
+            console.print(f"[dim]Flame graph saved to {html_path}[/dim]")
 
         # Save JSON report if requested
         if output_path:
