@@ -2,13 +2,13 @@
 
 import pytest
 
-from agenteval.metrics.basic import (
+from agentrial.metrics.basic import (
     compute_basic_metrics,
     compute_cost_per_correct,
     compute_latency_percentiles,
     compute_token_efficiency,
 )
-from agenteval.types import (
+from agentrial.types import (
     AgentMetadata,
     AgentOutput,
     TestCase,

@@ -48,7 +48,12 @@ coverage.xml
 # ruff
 .ruff_cache/
 
-# AgentEval specific
-agenteval-results.json
-agenteval-output.txt
+# Agentrial specific
+agentrial-results.json
+agentrial-output.txt
 baseline.json
+results.json
+*.jsonl
+
+# Claude Code
+.claude/

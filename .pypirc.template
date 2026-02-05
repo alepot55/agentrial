@@ -1,0 +1,22 @@
+# PyPI configuration template
+# Copy this to ~/.pypirc and fill in your credentials
+#
+# For TestPyPI (recommended for first upload):
+#   pip install --index-url https://test.pypi.org/simple/ agenteval
+#
+# For production PyPI:
+#   pip install agenteval
+
+[distutils]
+index-servers =
+    pypi
+    testpypi
+
+[pypi]
+username = __token__
+password = pypi-YOUR_TOKEN_HERE
+
+[testpypi]
+repository = https://test.pypi.org/legacy/
+username = __token__
+password = pypi-YOUR_TESTPYPI_TOKEN_HERE

@@ -1,0 +1,63 @@
+suite: langgraph-haiku-demo
+agent: agent.agent
+trials: 10
+threshold: 0.85
+
+cases:
+  # Easy tests - direct tool usage
+  - name: easy-multiply
+    input:
+      query: "What is 15 * 37?"
+    expected:
+      output_contains: ["555"]
+      tool_calls:
+        - tool: calculate
+
+  - name: easy-capital-japan
+    input:
+      query: "What is the capital of Japan?"
+    expected:
+      output_contains: ["Tokyo"]
+      tool_calls:
+        - tool: lookup_country_info
+
+  - name: easy-celsius-to-fahrenheit
+    input:
+      query: "Convert 100 degrees Celsius to Fahrenheit"
+    expected:
+      output_contains: ["212"]
+      tool_calls:
+        - tool: convert_temperature
+
+  # Medium tests - requires inference
+  - name: medium-population-france
+    input:
+      query: "How many people live in France?"
+    expected:
+      output_contains: ["68"]
+      tool_calls:
+        - tool: lookup_country_info
+
+  - name: medium-power-of-two
+    input:
+      query: "Calculate 2 to the power of 10"
+    expected:
+      output_contains: ["1024"]
+      tool_calls:
+        - tool: calculate
+
+  # Hard tests - multi-step reasoning
+  - name: hard-multi-step
+    input:
+      query: "What is the population of France divided by the population of Australia? Give me the ratio."
+    expected:
+      output_contains: ["2"]
+      tool_calls:
+        - tool: lookup_country_info
+
+  # Edge case - unknown country
+  - name: edge-unknown-country
+    input:
+      query: "What is the capital of Atlantis?"
+    expected:
+      output_contains_any: ["no data", "not found", "don't have", "fictional", "mythical"]

@@ -2,7 +2,7 @@
 
 import pytest
 
-from agenteval.metrics.statistical import (
+from agentrial.metrics.statistical import (
     benjamini_hochberg_correction,
     bootstrap_confidence_interval,
     compare_multiple_metrics,

@@ -1,6 +1,6 @@
 """Simple agent example for AgentEval."""
 
-from agenteval.types import (
+from agentrial.types import (
     AgentInput,
     AgentMetadata,
     AgentOutput,

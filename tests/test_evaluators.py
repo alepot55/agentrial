@@ -2,14 +2,14 @@
 
 import pytest
 
-from agenteval.evaluators.exact import (
+from agentrial.evaluators.exact import (
     contains,
     exact_match,
     regex_match,
     tool_called,
 )
-from agenteval.evaluators.expect import expect
-from agenteval.types import (
+from agentrial.evaluators.expect import expect
+from agentrial.types import (
     AgentMetadata,
     AgentOutput,
     StepType,

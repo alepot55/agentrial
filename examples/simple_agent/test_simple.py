@@ -1,7 +1,7 @@
 """Example Python test suite for simple_qa_agent."""
 
-from agenteval import Suite, TestCase, expect
-from agenteval.types import AgentInput
+from agentrial import Suite, TestCase, expect
+from agentrial.types import AgentInput
 
 # Create a test suite
 suite = Suite(

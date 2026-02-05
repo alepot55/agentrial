@@ -2,8 +2,8 @@
 
 import pytest
 
-from agenteval.runner.engine import MultiTrialEngine
-from agenteval.types import (
+from agentrial.runner.engine import MultiTrialEngine
+from agentrial.types import (
     AgentInput,
     AgentMetadata,
     AgentOutput,
