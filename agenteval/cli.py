@@ -1,6 +1,7 @@
 """AgentEval CLI - Statistical evaluation for AI agents."""
 
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -20,6 +21,18 @@ from agenteval.runner.engine import MultiTrialEngine, load_agent
 
 console = Console()
 logger = logging.getLogger("agenteval")
+
+
+def _ensure_cwd_in_path() -> None:
+    """Ensure current working directory is in Python path for agent imports.
+
+    This allows users to run agenteval without manually setting PYTHONPATH
+    when their agent module is in the current directory.
+    """
+    cwd = os.getcwd()
+    if cwd not in sys.path:
+        sys.path.insert(0, cwd)
+        logger.debug(f"Added {cwd} to sys.path for agent discovery")
 
 
 @click.group()
@@ -146,6 +159,9 @@ def run(
 
         # Create engine and run
         engine = MultiTrialEngine(trials=effective_trials)
+
+        # Ensure cwd is in path for agent imports
+        _ensure_cwd_in_path()
 
         try:
             agent = load_agent(suite.agent)
