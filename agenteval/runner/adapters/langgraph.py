@@ -1,35 +1,269 @@
 """LangGraph adapter for AgentEval.
 
 This adapter wraps LangGraph graphs and captures their execution
-trajectory using OpenTelemetry spans as the primary integration point.
+trajectory using LangChain callback handlers (primary) or OpenTelemetry
+spans (optional fallback).
 """
 
 import logging
 import time
 from typing import Any, Callable
+from uuid import UUID
 
+from agenteval.runner.adapters.pricing import MODEL_PRICING, calculate_cost
 from agenteval.runner.otel import OTelTrajectoryCapture
 from agenteval.runner.trajectory import TrajectoryRecorder
-from agenteval.types import AgentInput, AgentMetadata, AgentOutput, StepType
+from agenteval.types import AgentInput, AgentMetadata, AgentOutput, StepType, TrajectoryStep
 
 logger = logging.getLogger(__name__)
+
+
+class TrajectoryCallbackHandler:
+    """LangChain callback handler for capturing trajectory.
+
+    This handler intercepts LangChain/LangGraph events and records
+    them as trajectory steps for AgentEval analysis.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the callback handler."""
+        self.steps: list[TrajectoryStep] = []
+        self.step_index = 0
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+        self.model_name: str | None = None
+        self._pending_tool_calls: dict[str, dict[str, Any]] = {}
+        self._step_start_times: dict[str, float] = {}
+
+    def on_tool_start(
+        self,
+        serialized: dict[str, Any],
+        input_str: str,
+        *,
+        run_id: UUID,
+        parent_run_id: UUID | None = None,
+        tags: list[str] | None = None,
+        metadata: dict[str, Any] | None = None,
+        inputs: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Record tool call start."""
+        tool_name = serialized.get("name", "unknown_tool")
+        self._step_start_times[str(run_id)] = time.time()
+
+        # Parse inputs
+        params = inputs if inputs else {"input": input_str}
+
+        self._pending_tool_calls[str(run_id)] = {
+            "step_index": self.step_index,
+            "name": tool_name,
+            "parameters": params,
+            "start_time": time.time(),
+        }
+        self.step_index += 1
+
+    def on_tool_end(
+        self,
+        output: Any,
+        *,
+        run_id: UUID,
+        parent_run_id: UUID | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Record tool call end with output."""
+        run_id_str = str(run_id)
+        if run_id_str in self._pending_tool_calls:
+            pending = self._pending_tool_calls.pop(run_id_str)
+            duration_ms = (time.time() - pending["start_time"]) * 1000
+
+            # Create tool call step
+            self.steps.append(TrajectoryStep(
+                step_index=pending["step_index"],
+                step_type=StepType.TOOL_CALL,
+                name=pending["name"],
+                parameters=pending["parameters"],
+                output=str(output)[:1000] if output else None,
+                duration_ms=duration_ms,
+                tokens=0,
+            ))
+
+            # Create observation step
+            self.steps.append(TrajectoryStep(
+                step_index=self.step_index,
+                step_type=StepType.OBSERVATION,
+                name=f"tool_result_{pending['name']}",
+                parameters={},
+                output=str(output)[:1000] if output else None,
+                duration_ms=0,
+                tokens=0,
+            ))
+            self.step_index += 1
+
+    def on_tool_error(
+        self,
+        error: BaseException,
+        *,
+        run_id: UUID,
+        parent_run_id: UUID | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Record tool error."""
+        run_id_str = str(run_id)
+        if run_id_str in self._pending_tool_calls:
+            pending = self._pending_tool_calls.pop(run_id_str)
+            duration_ms = (time.time() - pending["start_time"]) * 1000
+
+            self.steps.append(TrajectoryStep(
+                step_index=pending["step_index"],
+                step_type=StepType.TOOL_CALL,
+                name=pending["name"],
+                parameters=pending["parameters"],
+                output=f"Error: {error}",
+                duration_ms=duration_ms,
+                tokens=0,
+            ))
+
+    def on_llm_start(
+        self,
+        serialized: dict[str, Any],
+        prompts: list[str],
+        *,
+        run_id: UUID,
+        parent_run_id: UUID | None = None,
+        tags: list[str] | None = None,
+        metadata: dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Record LLM call start."""
+        self._step_start_times[str(run_id)] = time.time()
+
+        # Try to extract model name
+        if "kwargs" in serialized:
+            self.model_name = serialized["kwargs"].get("model_name") or serialized["kwargs"].get("model")
+        if not self.model_name and "name" in serialized:
+            self.model_name = serialized["name"]
+
+    def on_llm_end(
+        self,
+        response: Any,
+        *,
+        run_id: UUID,
+        parent_run_id: UUID | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Record LLM call end with response and token usage."""
+        run_id_str = str(run_id)
+        start_time = self._step_start_times.pop(run_id_str, time.time())
+        duration_ms = (time.time() - start_time) * 1000
+
+        # Extract token usage from response
+        input_tokens = 0
+        output_tokens = 0
+        output_text = ""
+
+        if hasattr(response, "llm_output") and response.llm_output:
+            usage = response.llm_output.get("usage", {})
+            input_tokens = usage.get("input_tokens", 0) or usage.get("prompt_tokens", 0)
+            output_tokens = usage.get("output_tokens", 0) or usage.get("completion_tokens", 0)
+
+        # Try to get usage from generations
+        if hasattr(response, "generations") and response.generations:
+            for gen_list in response.generations:
+                for gen in gen_list:
+                    if hasattr(gen, "text"):
+                        output_text = gen.text
+                    if hasattr(gen, "message"):
+                        msg = gen.message
+                        if hasattr(msg, "content"):
+                            output_text = msg.content
+                        # Extract usage_metadata from message (langchain-anthropic style)
+                        if hasattr(msg, "usage_metadata") and msg.usage_metadata:
+                            um = msg.usage_metadata
+                            input_tokens = getattr(um, "input_tokens", 0) or 0
+                            output_tokens = getattr(um, "output_tokens", 0) or 0
+                        # Also check response_metadata
+                        if hasattr(msg, "response_metadata") and msg.response_metadata:
+                            rm = msg.response_metadata
+                            if "usage" in rm:
+                                usage = rm["usage"]
+                                input_tokens = usage.get("input_tokens", input_tokens)
+                                output_tokens = usage.get("output_tokens", output_tokens)
+
+        self.total_input_tokens += input_tokens
+        self.total_output_tokens += output_tokens
+
+        # Check if this was a tool call decision
+        has_tool_calls = False
+        if hasattr(response, "generations") and response.generations:
+            for gen_list in response.generations:
+                for gen in gen_list:
+                    if hasattr(gen, "message") and hasattr(gen.message, "tool_calls"):
+                        if gen.message.tool_calls:
+                            has_tool_calls = True
+
+        step_type = StepType.TOOL_CALL if has_tool_calls else StepType.LLM_CALL
+        step_name = "tool_decision" if has_tool_calls else "llm_response"
+
+        self.steps.append(TrajectoryStep(
+            step_index=self.step_index,
+            step_type=step_type,
+            name=step_name,
+            parameters={},
+            output=output_text[:1000] if output_text else None,
+            duration_ms=duration_ms,
+            tokens=input_tokens + output_tokens,
+            metadata={"input_tokens": input_tokens, "output_tokens": output_tokens},
+        ))
+        self.step_index += 1
+
+    def on_llm_error(
+        self,
+        error: BaseException,
+        *,
+        run_id: UUID,
+        parent_run_id: UUID | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Record LLM error."""
+        run_id_str = str(run_id)
+        start_time = self._step_start_times.pop(run_id_str, time.time())
+        duration_ms = (time.time() - start_time) * 1000
+
+        self.steps.append(TrajectoryStep(
+            step_index=self.step_index,
+            step_type=StepType.LLM_CALL,
+            name="llm_error",
+            parameters={},
+            output=f"Error: {error}",
+            duration_ms=duration_ms,
+            tokens=0,
+        ))
+        self.step_index += 1
+
+    def get_total_tokens(self) -> int:
+        """Get total token count."""
+        return self.total_input_tokens + self.total_output_tokens
+
+    def get_cost(self) -> float:
+        """Calculate cost based on model and token usage."""
+        if self.model_name:
+            return calculate_cost(
+                self.model_name,
+                self.total_input_tokens,
+                self.total_output_tokens,
+            )
+        # Fallback estimate
+        return self.get_total_tokens() * 0.000045
 
 
 class LangGraphAdapter:
     """Adapter for LangGraph graphs.
 
     This adapter wraps a LangGraph CompiledGraph and converts its
-    execution into the AgentEval trajectory format. It supports two modes:
+    execution into the AgentEval trajectory format.
 
-    1. OTel mode (preferred): Captures spans emitted by LangGraph's built-in
-       OpenTelemetry instrumentation. This is the recommended approach as it
-       provides richer data and works consistently across LangGraph versions.
-
-    2. Fallback mode: If OTel spans are not available, falls back to extracting
-       trajectory data from graph.stream() events.
-
-    The adapter automatically detects which mode to use based on whether
-    OTel spans are captured during execution.
+    Primary mode: Uses LangChain callback handlers to intercept events.
+    Fallback mode: Uses stream events or OTel spans if callbacks unavailable.
     """
 
     def __init__(
@@ -37,7 +271,8 @@ class LangGraphAdapter:
         graph: Any,
         input_key: str = "messages",
         output_key: str = "messages",
-        use_otel: bool = True,
+        use_callbacks: bool = True,
+        use_otel: bool = False,
     ) -> None:
         """Initialize the adapter.
 
@@ -45,11 +280,13 @@ class LangGraphAdapter:
             graph: A LangGraph CompiledGraph instance.
             input_key: Key in the graph state for input.
             output_key: Key in the graph state for output.
-            use_otel: Whether to attempt OTel span capture (default True).
+            use_callbacks: Whether to use callback handlers (default True).
+            use_otel: Whether to use OTel spans as fallback (default False).
         """
         self.graph = graph
         self.input_key = input_key
         self.output_key = output_key
+        self.use_callbacks = use_callbacks
         self.use_otel = use_otel
 
     def __call__(self, input: AgentInput) -> AgentOutput:
@@ -61,39 +298,109 @@ class LangGraphAdapter:
         Returns:
             AgentOutput with captured trajectory.
         """
-        if self.use_otel:
+        if self.use_callbacks:
+            return self._execute_with_callbacks(input)
+        elif self.use_otel:
             return self._execute_with_otel(input)
         return self._execute_with_stream(input)
 
-    def _execute_with_otel(self, input: AgentInput) -> AgentOutput:
-        """Execute graph with OTel span capture.
+    def _execute_with_callbacks(self, input: AgentInput) -> AgentOutput:
+        """Execute graph with callback-based trajectory capture.
 
-        This is the preferred method. It sets up OTel span capture,
-        runs the graph, and collects trajectory from captured spans.
+        This is the primary method using LangChain callbacks.
         """
+        start_time = time.time()
+        handler = TrajectoryCallbackHandler()
+
+        try:
+            input_state = self._build_input_state(input)
+
+            # Try to create a LangChain callback handler wrapper
+            try:
+                from langchain_core.callbacks import BaseCallbackHandler
+
+                # Create a wrapper that delegates to our handler
+                class CallbackWrapper(BaseCallbackHandler):
+                    def __init__(self, trajectory_handler: TrajectoryCallbackHandler):
+                        self.handler = trajectory_handler
+
+                    def on_tool_start(self, serialized, input_str, **kwargs):
+                        self.handler.on_tool_start(serialized, input_str, **kwargs)
+
+                    def on_tool_end(self, output, **kwargs):
+                        self.handler.on_tool_end(output, **kwargs)
+
+                    def on_tool_error(self, error, **kwargs):
+                        self.handler.on_tool_error(error, **kwargs)
+
+                    def on_llm_start(self, serialized, prompts, **kwargs):
+                        self.handler.on_llm_start(serialized, prompts, **kwargs)
+
+                    def on_llm_end(self, response, **kwargs):
+                        self.handler.on_llm_end(response, **kwargs)
+
+                    def on_llm_error(self, error, **kwargs):
+                        self.handler.on_llm_error(error, **kwargs)
+
+                callback_wrapper = CallbackWrapper(handler)
+
+                # Invoke with callbacks
+                config = {"callbacks": [callback_wrapper]}
+                final_state = self.graph.invoke(input_state, config=config)
+
+            except ImportError:
+                logger.warning("langchain_core not available, falling back to stream mode")
+                return self._execute_with_stream(input)
+
+            final_output = self._extract_final_output(final_state)
+            duration_ms = (time.time() - start_time) * 1000
+
+            # Sort steps by index
+            steps = sorted(handler.steps, key=lambda s: s.step_index)
+
+            return AgentOutput(
+                output=final_output,
+                steps=steps,
+                metadata=AgentMetadata(
+                    total_tokens=handler.get_total_tokens(),
+                    cost=handler.get_cost(),
+                    duration_ms=duration_ms,
+                ),
+                success=True,
+            )
+
+        except Exception as e:
+            logger.error("LangGraph execution failed: %s", e)
+            duration_ms = (time.time() - start_time) * 1000
+
+            return AgentOutput(
+                output="",
+                steps=handler.steps,
+                metadata=AgentMetadata(
+                    total_tokens=handler.get_total_tokens(),
+                    cost=handler.get_cost(),
+                    duration_ms=duration_ms,
+                ),
+                success=False,
+                error=str(e),
+            )
+
+    def _execute_with_otel(self, input: AgentInput) -> AgentOutput:
+        """Execute graph with OTel span capture (fallback)."""
         start_time = time.time()
 
         with OTelTrajectoryCapture() as capture:
             try:
                 input_state = self._build_input_state(input)
-
-                # Invoke the graph
                 final_state = self.graph.invoke(input_state)
-
-                # Extract final output
                 final_output = self._extract_final_output(final_state)
-
                 duration_ms = (time.time() - start_time) * 1000
 
-                # Get steps from OTel capture
                 steps = capture.get_steps()
-
-                # If no OTel spans were captured, fall back to stream mode
                 if not steps:
                     logger.debug("No OTel spans captured, falling back to stream mode")
                     return self._execute_with_stream(input)
 
-                # Calculate totals from steps
                 total_tokens = sum(s.tokens for s in steps)
 
                 return AgentOutput(
@@ -101,7 +408,7 @@ class LangGraphAdapter:
                     steps=steps,
                     metadata=AgentMetadata(
                         total_tokens=total_tokens,
-                        cost=self._estimate_cost(total_tokens),
+                        cost=total_tokens * 0.000045,
                         duration_ms=duration_ms,
                     ),
                     success=True,
@@ -121,10 +428,7 @@ class LangGraphAdapter:
                 )
 
     def _execute_with_stream(self, input: AgentInput) -> AgentOutput:
-        """Execute graph with stream-based trajectory capture.
-
-        Fallback method when OTel spans are not available.
-        """
+        """Execute graph with stream-based trajectory capture (fallback)."""
         recorder = TrajectoryRecorder()
         start_time = time.time()
         total_tokens = 0
@@ -166,7 +470,7 @@ class LangGraphAdapter:
                 steps=recorder.steps,
                 metadata=AgentMetadata(
                     total_tokens=total_tokens,
-                    cost=self._estimate_cost(total_tokens),
+                    cost=total_tokens * 0.000045,
                     duration_ms=duration_ms,
                 ),
                 success=True,
@@ -254,17 +558,10 @@ class LangGraphAdapter:
                 messages = node_output["messages"]
                 if messages:
                     last = messages[-1]
-                    if hasattr(last, "usage_metadata"):
-                        return getattr(last.usage_metadata, "total_tokens", 0)
+                    if hasattr(last, "usage_metadata") and last.usage_metadata:
+                        um = last.usage_metadata
+                        return (getattr(um, "input_tokens", 0) or 0) + (getattr(um, "output_tokens", 0) or 0)
         return 0
-
-    def _estimate_cost(self, tokens: int) -> float:
-        """Estimate cost based on token count.
-
-        Uses GPT-4 pricing as a rough estimate. Actual cost depends on model.
-        """
-        # GPT-4 ~$0.03/1K input, $0.06/1K output, assume 50/50 split
-        return tokens * 0.000045
 
     def get_agent_callable(self) -> Callable[[AgentInput], AgentOutput]:
         """Get the adapter as a callable."""
@@ -275,20 +572,21 @@ def wrap_langgraph_agent(
     graph: Any,
     input_key: str = "messages",
     output_key: str = "messages",
-    use_otel: bool = True,
+    use_callbacks: bool = True,
+    use_otel: bool = False,
 ) -> Callable[[AgentInput], AgentOutput]:
     """Wrap a LangGraph CompiledGraph for use with AgentEval.
 
     This function creates an adapter that captures the execution trajectory
-    of a LangGraph graph. By default, it uses OpenTelemetry spans for
-    trajectory capture, which provides the richest data. If OTel spans
-    are not available, it falls back to extracting data from stream events.
+    of a LangGraph graph using LangChain callback handlers (primary method)
+    or OTel spans / stream events (fallback).
 
     Args:
         graph: A LangGraph CompiledGraph instance.
         input_key: Key in the graph state for input (default "messages").
         output_key: Key in the graph state for output (default "messages").
-        use_otel: Whether to use OTel span capture (default True).
+        use_callbacks: Whether to use callback handlers (default True, recommended).
+        use_otel: Whether to use OTel spans as fallback (default False).
 
     Returns:
         A callable that takes AgentInput and returns AgentOutput.
@@ -304,11 +602,7 @@ def wrap_langgraph_agent(
         # Wrap for AgentEval
         agent = wrap_langgraph_agent(compiled)
 
-        # Define test suite
-        suite = Suite(
-            name="my-agent-tests",
-            agent=agent,
-            trials=10,
-        )
+        # Use in test suite
+        # In agenteval.yml, reference the wrapped agent
     """
-    return LangGraphAdapter(graph, input_key, output_key, use_otel)
+    return LangGraphAdapter(graph, input_key, output_key, use_callbacks, use_otel)
