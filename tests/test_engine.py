@@ -228,3 +228,33 @@ class TestMultiTrialEngine:
 
         assert not result.passed
         assert any("exception" in f.lower() for f in result.failures)
+
+    def test_agent_success_false_is_failure(self) -> None:
+        """Test that agent returning success=False is treated as failure.
+
+        This is critical: if an agent returns success=False (e.g., due to
+        API errors, authentication failures), the trial must be marked as
+        failed, not silently passed.
+        """
+        engine = MultiTrialEngine(trials=1)
+
+        def failed_agent(input: AgentInput) -> AgentOutput:
+            return AgentOutput(
+                output="",
+                steps=[],
+                metadata=AgentMetadata(),
+                success=False,
+                error="API authentication failed",
+            )
+
+        test_case = TestCase(
+            name="test",
+            input=AgentInput(query="test"),
+            expected=ExpectedOutput(contains=["anything"]),
+        )
+
+        result = engine.run_single_trial(failed_agent, test_case, 0)
+
+        assert not result.passed
+        assert any("agent failed" in f.lower() for f in result.failures)
+        assert any("authentication" in f.lower() for f in result.failures)
