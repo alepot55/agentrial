@@ -1,242 +1,157 @@
 # AgentEval
 
-**Statistical evaluation framework for AI agents** - the pytest for agent trajectories.
-
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![CI](https://github.com/agenteval/agenteval/workflows/CI/badge.svg)](https://github.com/agenteval/agenteval/actions)
+[![PyPI](https://img.shields.io/pypi/v/agenteval.svg)](https://pypi.org/project/agenteval/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
----
-
-## The Problem
-
-Your agent passes Monday, fails Wednesday. Same prompt. Same model. Same code.
-
-AI agents are inherently non-deterministic. A single test run tells you nothing about reliability. You need:
-
-- **Multiple trials** to understand true performance
-- **Confidence intervals** to know if changes are real improvements
-- **Step-level analysis** to find where failures happen
-- **CI/CD integration** to catch regressions before production
-
-## The Solution
-
-AgentEval runs your agent N times (default: 10), computes pass rates with 95% confidence intervals, and identifies which trajectory step most likely causes failures.
-
-```bash
-pip install agenteval
-agenteval run tests/test_my_agent.yml
-```
-
-Output:
-```
-┏━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Test Case         ┃ Pass Rate ┃ 95% CI       ┃ Avg Cost ┃ Avg Latency ┃ Avg Tokens ┃
-┡━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━┩
-│ flight-search     │ 80.0%     │ (55%-93%)    │ $0.0012  │ 234ms       │ 156        │
-│ weather-query     │ 100.0%    │ (74%-100%)   │ $0.0008  │ 189ms       │ 98         │
-│ booking-flow      │ 60.0%     │ (31%-83%)    │ $0.0045  │ 892ms       │ 445        │
-└───────────────────┴───────────┴──────────────┴──────────┴─────────────┴────────────┘
-
-Overall Pass Rate: 80.0% (67%-89%)
-Total Cost: $0.065
-```
-
-## Quick Start
-
-### 1. Install
+**Your agent passes Monday, fails Wednesday. Same prompt. agenteval tells you why.**
 
 ```bash
 pip install agenteval
 ```
 
-### 2. Define your agent
+## Quickstart
 
-Your agent must accept `AgentInput` and return `AgentOutput`:
+### 1. Define your agent
 
 ```python
 # my_agent.py
-from agenteval.types import AgentInput, AgentOutput, AgentMetadata
+from agenteval.types import AgentInput, AgentOutput, AgentMetadata, TrajectoryStep, StepType
 
-def my_agent(input: AgentInput) -> AgentOutput:
-    # Your agent logic here
-    result = call_llm(input.query)
+def search_agent(input: AgentInput) -> AgentOutput:
+    # Your agent logic - call LLM, use tools, etc.
+    response = llm.chat(input.query)
 
     return AgentOutput(
-        output=result.text,
-        steps=result.trajectory,  # Optional: trajectory steps
+        output=response.text,
+        steps=[
+            TrajectoryStep(
+                step_index=0,
+                step_type=StepType.TOOL_CALL,
+                name="search_flights",
+                parameters={"destination": "TYO"},
+                output={"flights": [...]},
+            ),
+        ],
         metadata=AgentMetadata(
-            total_tokens=result.tokens,
-            cost=result.cost,
-            duration_ms=result.duration,
+            total_tokens=response.usage.total_tokens,
+            cost=response.usage.total_tokens * 0.00003,
         ),
     )
 ```
 
-### 3. Write test cases
-
-**YAML format:**
+### 2. Write test cases
 
 ```yaml
-# tests/test_my_agent.yml
-suite: my-agent-tests
-agent: my_agent.my_agent
+# tests/test_search.yml
+suite: search-agent
+agent: my_agent.search_agent
 trials: 10
 threshold: 0.85
 
 cases:
-  - name: basic-query
+  - name: flight-search
     input:
-      query: "What is the capital of France?"
+      query: "Find cheapest flight from Rome to Tokyo in March"
     expected:
-      output_contains:
-        - "Paris"
-
-  - name: tool-usage
-    input:
-      query: "Search for flights to Tokyo"
-    expected:
+      output_contains: ["flight", "Tokyo"]
       tool_calls:
         - tool: search_flights
-          params_contain:
-            destination: "TYO"
+          params_contain: {destination: "TYO"}
+
+  - name: hotel-search
+    input:
+      query: "Find hotels near Shibuya station"
+    expected:
+      output_contains: ["hotel", "Shibuya"]
 ```
 
-**Python format:**
-
-```python
-# tests/test_my_agent.py
-from agenteval import Suite, expect
-
-suite = Suite(
-    name="my-agent-tests",
-    agent="my_agent.my_agent",
-    trials=10,
-    threshold=0.85,
-)
-
-@suite.case
-def test_basic_query(result):
-    expect(result).output.contains("Paris")
-    expect(result).cost_below(0.01)
-    expect(result).latency_below(1000)
-```
-
-### 4. Run
+### 3. Run evaluation
 
 ```bash
-agenteval run tests/
+agenteval run tests/test_search.yml --trials 10
 ```
 
-## Framework Integration
+Output:
 
-### LangGraph
+```
+AgentEval v0.1.0
+
+Running suite: search-agent (2 test cases, 10 trials each)
+
+┏━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Test Case      ┃ Pass Rate ┃ 95% CI       ┃ Avg Cost ┃ Avg Latency ┃
+┡━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ flight-search  │ 80%       │ (49%-94%)    │ $0.0023  │ 342ms       │
+│ hotel-search   │ 70%       │ (40%-89%)    │ $0.0019  │ 287ms       │
+└────────────────┴───────────┴──────────────┴──────────┴─────────────┘
+
+Overall: 75% (58%-87%) | Threshold: 85% | Status: FAILED
+
+Failure Attribution:
+  flight-search: Step 1 (tool_selection) shows significant divergence (p=0.02)
+    - Successful runs: search_flights (8/8)
+    - Failed runs: search_hotels (2/2)
+
+  hotel-search: Step 2 (parameter_extraction) shows significant divergence (p=0.04)
+    - Successful runs: location="Shibuya" (7/7)
+    - Failed runs: location="Tokyo" (3/3)
+
+Total cost: $0.042 | Duration: 12.4s
+```
+
+The output shows:
+- **Pass rate with confidence interval**: 80% (49%-94%) means the true pass rate is likely between 49% and 94%
+- **Failure attribution**: Step 1 diverges between successful and failed runs - successful runs call `search_flights`, failed runs call `search_hotels`
+- **Cost tracking**: Total spend across all trials
+
+## CI/CD
+
+Add to your GitHub workflow (`.github/workflows/agenteval.yml`):
+
+```yaml
+- uses: agenteval/agenteval@v1
+  with:
+    trials: 10
+    threshold: 0.9
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+```
+
+The action posts results as a PR comment and fails if pass rate drops below threshold.
+
+## Why AgentEval?
+
+- **Statistical rigor**: Wilson score confidence intervals, not single-run pass/fail. Know if your 80% pass rate is real or noise.
+
+- **Trajectory analysis**: When tests fail, identifies which step diverged between successful and failed runs using Fisher's exact test.
+
+- **Framework-agnostic**: Works with LangGraph, raw OpenAI calls, or any Python function. Uses OpenTelemetry spans as the universal integration point.
+
+## LangGraph Integration
 
 ```python
 from langgraph.graph import StateGraph
 from agenteval.adapters.langgraph import wrap_langgraph_agent
 
-# Your LangGraph
 graph = StateGraph(...)
 compiled = graph.compile()
-
-# Wrap for AgentEval
-agent = wrap_langgraph_agent(compiled)
+agent = wrap_langgraph_agent(compiled)  # Captures trajectory via OTel spans
 ```
 
-## CLI Commands
+## CLI Reference
 
 ```bash
-# Run all tests
-agenteval run
+agenteval run [PATH]           # Run tests (default: tests/)
+agenteval run --trials 20      # Override trial count
+agenteval run --threshold 0.9  # Override pass threshold
+agenteval run -o results.json  # Export JSON for CI
 
-# Run specific test file
-agenteval run tests/test_flight.yml
-
-# Override trials and threshold
-agenteval run --trials 20 --threshold 0.9
-
-# Save results as JSON
-agenteval run -o results.json
-
-# Compare against baseline
-agenteval compare results.json --baseline baseline.json
-
-# Save new baseline
-agenteval baseline results.json
-
-# Initialize project
-agenteval init
+agenteval compare --baseline baseline.json  # Compare against baseline
+agenteval baseline results.json             # Save new baseline
+agenteval init                              # Initialize project
 ```
-
-## CI/CD Integration
-
-### GitHub Actions
-
-```yaml
-# .github/workflows/agenteval.yml
-name: AgentEval
-
-on: [pull_request]
-
-jobs:
-  evaluate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - run: pip install agenteval
-      - run: agenteval run --threshold 0.85
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-```
-
-## Statistical Methods
-
-### Pass Rate Confidence Intervals
-
-AgentEval uses the **Wilson score interval**, which is accurate for small samples and extreme proportions (unlike naive normal approximation).
-
-With N=10 trials:
-- 70% observed → 95% CI: 40%-89%
-- 100% observed → 95% CI: 74%-100%
-
-### Regression Detection
-
-Compares runs using **Fisher's exact test** (for pass rates) and **Mann-Whitney U** (for latency/cost). Detects significant regressions at p<0.05.
-
-### Failure Attribution
-
-When tests fail, AgentEval analyzes which trajectory step shows significant divergence between successful and failed runs, helping you pinpoint the root cause.
-
-## Configuration
-
-Create `agenteval.yml` in your project root:
-
-```yaml
-trials: 10
-threshold: 0.85
-output_format: terminal  # or "json"
-verbose: false
-```
-
-## Why AgentEval?
-
-| Feature | AgentEval | LangSmith | Promptfoo | DeepEval |
-|---------|-----------|-----------|-----------|----------|
-| Multi-trial by default | Yes | No | No | No |
-| Confidence intervals | Yes | No | No | No |
-| Step-level analysis | Yes | Partial | No | No |
-| Framework agnostic | Yes | LangChain | Yes | Yes |
-| Local-first | Yes | Cloud | Yes | Yes |
-| Statistical regression detection | Yes | No | No | No |
 
 ## License
 
 MIT
-
-## Contributing
-
-Contributions welcome! Please read our contributing guide and submit PRs.
