@@ -96,31 +96,44 @@ def print_results(suite_result: SuiteResult, verbose: bool = False) -> None:
     console.print(f"[bold]Total Duration:[/bold] {format_latency(suite_result.total_duration_ms)}")
     console.print()
 
-    # Print failure attribution if verbose
-    if verbose:
-        _print_failure_attribution(suite_result)
+    # Print failure attribution when there are failures (not just in verbose mode)
+    has_failures = any(r.pass_rate < 1.0 for r in suite_result.results)
+    if has_failures:
+        _print_failure_attribution(suite_result, verbose=verbose)
 
 
-def _print_failure_attribution(suite_result: SuiteResult) -> None:
-    """Print failure attribution details."""
-    has_failures = False
+def _print_failure_attribution(suite_result: SuiteResult, verbose: bool = False) -> None:
+    """Print failure attribution details.
+
+    Args:
+        suite_result: The suite result to analyze.
+        verbose: If True, show additional details.
+    """
+    printed_any = False
 
     for result in suite_result.results:
-        if result.failure_attribution and result.failure_attribution.get("most_likely_step") is not None:
-            has_failures = True
-            console.print(f"\n[bold yellow]Failure Analysis: {result.test_case.name}[/bold yellow]")
-            console.print(f"  {result.failure_attribution.get('recommendation', 'No recommendation')}")
+        if result.pass_rate < 1.0:  # Only show attribution for tests with failures
+            if result.failure_attribution and result.failure_attribution.get("most_likely_step") is not None:
+                printed_any = True
+                console.print(f"\n[bold yellow]Failure Analysis: {result.test_case.name}[/bold yellow]")
+                console.print(f"  {result.failure_attribution.get('recommendation', 'No recommendation')}")
 
-            # Print failure patterns
-            patterns = result.failure_attribution.get("failure_patterns", [])
-            if patterns:
-                console.print("  [bold]Common failures:[/bold]")
-                for pattern in patterns[:3]:
-                    console.print(
-                        f"    - {pattern['message'][:80]}... ({pattern['count']} occurrences)"
-                    )
+                # Print failure patterns in verbose mode
+                if verbose:
+                    patterns = result.failure_attribution.get("failure_patterns", [])
+                    if patterns:
+                        console.print("  [bold]Common failures:[/bold]")
+                        for pattern in patterns[:3]:
+                            msg = pattern['message'][:80]
+                            console.print(f"    - {msg}... ({pattern['count']} occurrences)")
+            elif result.pass_rate < 1.0:
+                # Test failed but no attribution - still show basic info
+                printed_any = True
+                failed_count = sum(1 for t in result.trials if not t.passed)
+                console.print(f"\n[bold yellow]Failures: {result.test_case.name}[/bold yellow]")
+                console.print(f"  {failed_count}/{len(result.trials)} trials failed")
 
-    if not has_failures:
+    if not printed_any and verbose:
         console.print("[dim]No significant failure patterns detected.[/dim]")
 
 
