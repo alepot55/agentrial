@@ -102,6 +102,11 @@ def main(ctx: click.Context, verbose: bool) -> None:
     type=click.Path(),
     help="Export flame graph as HTML file",
 )
+@click.option(
+    "--update-snapshots",
+    is_flag=True,
+    help="Save results as new snapshot baseline",
+)
 @click.pass_context
 def run(
     ctx: click.Context,
@@ -113,6 +118,7 @@ def run(
     json_output: bool,
     flamegraph: bool,
     html_path: str | None,
+    update_snapshots: bool,
 ) -> None:
     """Run evaluation suite(s).
 
@@ -243,6 +249,30 @@ def run(
             html_content = export_suite_flamegraphs_html(suite_result)
             Path(html_path).write_text(html_content)
             console.print(f"[dim]Flame graph saved to {html_path}[/dim]")
+
+        # Snapshot handling
+        if update_snapshots:
+            from agentrial.snapshots import create_snapshot, save_snapshot
+
+            snap = create_snapshot(suite_result)
+            snap_path = save_snapshot(snap)
+            console.print(f"[green]Snapshot saved: {snap_path}[/green]")
+        elif not json_output:
+            # Auto-compare with existing snapshot if available
+            from agentrial.snapshots import (
+                compare_with_snapshot,
+                find_snapshot,
+                load_snapshot,
+                print_snapshot_comparison,
+            )
+
+            snap_path = find_snapshot(suite.name)
+            if snap_path:
+                snap = load_snapshot(snap_path)
+                comparison = compare_with_snapshot(suite_result, snap)
+                print_snapshot_comparison(comparison, console)
+                if not comparison.overall_passed:
+                    total_passed = False
 
         # Save JSON report if requested
         if output_path:
