@@ -222,6 +222,11 @@ def load_suite(path: Path) -> Suite:
 def discover_test_files(directory: Path, pattern: str = "test_*.yml") -> list[Path]:
     """Discover test files in a directory.
 
+    Looks for test files with the following patterns:
+    - test_*.yml / test_*.yaml (standard test files)
+    - test_*.py (Python test files)
+    - agenteval.yml / agenteval.yaml (project-level test suites)
+
     Args:
         directory: Directory to search.
         pattern: Glob pattern for test files.
@@ -230,6 +235,13 @@ def discover_test_files(directory: Path, pattern: str = "test_*.yml") -> list[Pa
         List of test file paths.
     """
     files = list(directory.glob(pattern))
+    # Also look for YAML variants
+    files.extend(directory.glob("test_*.yaml"))
     # Also look for Python test files
     files.extend(directory.glob("test_*.py"))
-    return sorted(files)
+    # Also look for agenteval.yml/yaml as valid test suite files
+    for name in ("agenteval.yml", "agenteval.yaml"):
+        agenteval_file = directory / name
+        if agenteval_file.exists():
+            files.append(agenteval_file)
+    return sorted(set(files))  # Remove duplicates and sort
