@@ -1,4 +1,4 @@
-"""Statistical methods for AgentEval.
+"""Statistical methods for Agentrial.
 
 This module implements statistically rigorous methods for:
 - Confidence intervals for proportions (Wilson score)

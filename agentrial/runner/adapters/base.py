@@ -11,7 +11,7 @@ class BaseAdapter(ABC):
     """Abstract base class for framework adapters.
 
     Adapters wrap framework-specific agents to provide a uniform interface
-    for AgentEval. Each adapter is responsible for:
+    for Agentrial. Each adapter is responsible for:
     1. Invoking the wrapped agent
     2. Capturing trajectory steps (tool calls, LLM calls, etc.)
     3. Extracting token usage and cost information
@@ -103,7 +103,7 @@ def wrap_function(
     func: Callable[[AgentInput], AgentOutput | dict[str, Any] | str],
     name: str | None = None,
 ) -> Callable[[AgentInput], AgentOutput]:
-    """Wrap a simple function as an AgentEval-compatible agent.
+    """Wrap a simple function as an Agentrial-compatible agent.
 
     Args:
         func: The function to wrap.

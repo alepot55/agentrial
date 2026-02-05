@@ -1,4 +1,4 @@
-"""AgentEval - Statistical evaluation framework for AI agents."""
+"""Agentrial - Statistical evaluation framework for AI agents."""
 
 from agentrial.evaluators.expect import expect
 from agentrial.types import (

@@ -1,4 +1,4 @@
-"""Simple agent example for AgentEval."""
+"""Simple agent example for Agentrial."""
 
 from agentrial.types import (
     AgentInput,

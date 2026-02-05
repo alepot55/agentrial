@@ -1,4 +1,4 @@
-"""Rich terminal output for AgentEval results."""
+"""Rich terminal output for Agentrial results."""
 
 from rich.console import Console
 from rich.panel import Panel

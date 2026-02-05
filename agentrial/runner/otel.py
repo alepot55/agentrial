@@ -1,4 +1,4 @@
-"""OpenTelemetry span processing for AgentEval.
+"""OpenTelemetry span processing for Agentrial.
 
 This module provides the universal integration point for all framework adapters.
 Frameworks that emit OTel spans (LangGraph, Pydantic AI, OpenAI SDK, etc.) can

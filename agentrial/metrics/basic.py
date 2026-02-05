@@ -1,4 +1,4 @@
-"""Basic metrics computation for AgentEval."""
+"""Basic metrics computation for Agentrial."""
 
 from typing import Any
 

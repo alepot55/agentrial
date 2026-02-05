@@ -1,4 +1,4 @@
-"""JSON export for AgentEval results."""
+"""JSON export for Agentrial results."""
 
 import json
 from datetime import datetime

@@ -1,4 +1,4 @@
-"""Framework adapters for AgentEval."""
+"""Framework adapters for Agentrial."""
 
 from agentrial.runner.adapters.base import BaseAdapter
 from agentrial.runner.adapters.langgraph import wrap_langgraph_agent
