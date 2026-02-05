@@ -1,15 +1,15 @@
 """AgentEval - Statistical evaluation framework for AI agents."""
 
+from agentrial.evaluators.expect import expect
 from agentrial.types import (
     AgentInput,
     AgentOutput,
-    TrajectoryStep,
     EvalResult,
+    Suite,
     SuiteResult,
     TestCase,
-    Suite,
+    TrajectoryStep,
 )
-from agentrial.evaluators.expect import expect
 
 __version__ = "0.1.3"
 

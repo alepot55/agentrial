@@ -8,8 +8,14 @@ spans (optional fallback).
 import logging
 import time
 import warnings
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 from uuid import UUID
+
+from agentrial.runner.adapters.pricing import calculate_cost
+from agentrial.runner.otel import OTelTrajectoryCapture
+from agentrial.runner.trajectory import TrajectoryRecorder
+from agentrial.types import AgentInput, AgentMetadata, AgentOutput, StepType, TrajectoryStep
 
 # Silence LangGraph deprecation warnings about create_react_agent
 warnings.filterwarnings(
@@ -17,11 +23,6 @@ warnings.filterwarnings(
     message=".*create_react_agent has been moved.*",
     category=DeprecationWarning,
 )
-
-from agentrial.runner.adapters.pricing import MODEL_PRICING, calculate_cost
-from agentrial.runner.otel import OTelTrajectoryCapture
-from agentrial.runner.trajectory import TrajectoryRecorder
-from agentrial.types import AgentInput, AgentMetadata, AgentOutput, StepType, TrajectoryStep
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +148,10 @@ class TrajectoryCallbackHandler:
 
         # Try to extract model name
         if "kwargs" in serialized:
-            self.model_name = serialized["kwargs"].get("model_name") or serialized["kwargs"].get("model")
+            self.model_name = (
+                serialized["kwargs"].get("model_name")
+                or serialized["kwargs"].get("model")
+            )
         if not self.model_name and "name" in serialized:
             self.model_name = serialized["name"]
 
@@ -568,7 +572,9 @@ class LangGraphAdapter:
                     last = messages[-1]
                     if hasattr(last, "usage_metadata") and last.usage_metadata:
                         um = last.usage_metadata
-                        return (getattr(um, "input_tokens", 0) or 0) + (getattr(um, "output_tokens", 0) or 0)
+                        input_tok = getattr(um, "input_tokens", 0) or 0
+                        output_tok = getattr(um, "output_tokens", 0) or 0
+                        return input_tok + output_tok
         return 0
 
     def get_agent_callable(self) -> Callable[[AgentInput], AgentOutput]:

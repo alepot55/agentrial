@@ -1,6 +1,5 @@
 """Tests for evaluators."""
 
-import pytest
 
 from agentrial.evaluators.exact import (
     contains,
@@ -168,8 +167,9 @@ class TestExpectAPI:
     def test_expect_output_contains(self) -> None:
         """Test expect().output.contains()."""
         output = self.create_output("The flight costs $500")
-        expectation = expect(output).output.contains("flight", "$500")
-        assert expect(output).passed()
+        e = expect(output)
+        e.output.contains("flight", "$500")
+        assert e.passed()
 
     def test_expect_output_missing(self) -> None:
         """Test expect().output.contains() with missing text."""

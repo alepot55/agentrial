@@ -9,10 +9,10 @@ from agentrial.metrics.basic import (
     compute_token_efficiency,
 )
 from agentrial.types import (
+    AgentInput,
     AgentMetadata,
     AgentOutput,
     TestCase,
-    AgentInput,
     TrialResult,
 )
 

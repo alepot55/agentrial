@@ -305,7 +305,7 @@ def benjamini_hochberg_correction(
     # Determine significance
     # Find largest rank k where p_(k) <= k/n * alpha
     max_significant_rank = 0
-    for rank, (original_idx, p) in enumerate(indexed_pvalues, 1):
+    for rank, (_original_idx, p) in enumerate(indexed_pvalues, 1):
         threshold = rank / n * alpha
         if p <= threshold:
             max_significant_rank = rank

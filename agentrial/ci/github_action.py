@@ -87,7 +87,8 @@ def format_pr_comment(results: dict[str, Any]) -> str:
         f"## AgentEval Results :{status_emoji}:",
         "",
         f"**Status**: {status}",
-        f"**Overall Pass Rate**: {pass_rate:.1%} (95% CI: {ci.get('lower', 0):.1%}-{ci.get('upper', 0):.1%})",
+        f"**Overall Pass Rate**: {pass_rate:.1%} "
+        f"(95% CI: {ci.get('lower', 0):.1%}-{ci.get('upper', 0):.1%})",
         f"**Total Cost**: ${summary.get('total_cost', 0):.4f}",
         "",
         "### Test Results",
@@ -132,8 +133,8 @@ def post_pr_comment(
     """
     try:
         import requests
-    except ImportError:
-        raise ImportError("requests library required for posting PR comments")
+    except ImportError as err:
+        raise ImportError("requests library required for posting PR comments") from err
 
     comment = format_pr_comment(results)
 

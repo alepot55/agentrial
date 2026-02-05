@@ -1,7 +1,8 @@
 """Base adapter interface for framework integrations."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from agentrial.types import AgentInput, AgentOutput
 

@@ -87,10 +87,14 @@ def print_results(suite_result: SuiteResult, verbose: bool = False) -> None:
     # Print summary
     console.print()
     summary_style = "green" if suite_result.passed else "red"
+    ci_str = format_ci(
+        suite_result.overall_pass_rate_ci.lower,
+        suite_result.overall_pass_rate_ci.upper
+    )
     console.print(
         f"[bold]Overall Pass Rate:[/bold] "
-        f"[{summary_style}]{format_percentage(suite_result.overall_pass_rate)}[/{summary_style}] "
-        f"{format_ci(suite_result.overall_pass_rate_ci.lower, suite_result.overall_pass_rate_ci.upper)}"
+        f"[{summary_style}]{format_percentage(suite_result.overall_pass_rate)}"
+        f"[/{summary_style}] {ci_str}"
     )
     console.print(f"[bold]Total Cost:[/bold] {format_cost(suite_result.total_cost)}")
     console.print(f"[bold]Total Duration:[/bold] {format_latency(suite_result.total_duration_ms)}")
@@ -123,10 +127,17 @@ def _print_failure_attribution(suite_result: SuiteResult, verbose: bool = False)
         total_count = len(result.trials)
         pass_rate_pct = format_percentage(result.pass_rate)
 
-        console.print(f"\n[bold yellow]Failures: {result.test_case.name}[/bold yellow] ({pass_rate_pct} pass rate)")
+        console.print(
+            f"\n[bold yellow]Failures: {result.test_case.name}[/bold yellow] "
+            f"({pass_rate_pct} pass rate)"
+        )
 
         # If we have Fisher test attribution (mixed results), show it
-        if result.failure_attribution and result.failure_attribution.get("most_likely_step") is not None:
+        has_attribution = (
+            result.failure_attribution
+            and result.failure_attribution.get("most_likely_step") is not None
+        )
+        if has_attribution:
             recommendation = result.failure_attribution.get("recommendation", "")
             if recommendation:
                 console.print(f"  [dim]Analysis:[/dim] {recommendation}")
@@ -161,7 +172,9 @@ def _print_failure_attribution(suite_result: SuiteResult, verbose: bool = False)
 
         # Show most common failure reasons
         if failure_counter:
-            console.print(f"  [bold]Most common failures:[/bold] ({failed_count}/{total_count} trials)")
+            console.print(
+                f"  [bold]Most common failures:[/bold] ({failed_count}/{total_count} trials)"
+            )
             for failure_msg, count in failure_counter.most_common(3):
                 # Truncate for display
                 display_msg = failure_msg[:70] + "..." if len(failure_msg) > 70 else failure_msg
@@ -169,10 +182,12 @@ def _print_failure_attribution(suite_result: SuiteResult, verbose: bool = False)
 
         # Show wrong tool usage if detected
         if wrong_tool_counter and expected_tools:
-            console.print(f"  [bold]Wrong tool called:[/bold]")
+            console.print("  [bold]Wrong tool called:[/bold]")
             for wrong_tool, count in wrong_tool_counter.most_common(2):
                 expected_str = ", ".join(sorted(expected_tools))
-                console.print(f"    - '{wrong_tool}' instead of expected '{expected_str}' ({count}x)")
+                console.print(
+                    f"    - '{wrong_tool}' instead of expected '{expected_str}' ({count}x)"
+                )
 
         # In verbose mode, show additional patterns
         if verbose and result.failure_attribution:

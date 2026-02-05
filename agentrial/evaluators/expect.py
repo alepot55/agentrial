@@ -201,7 +201,7 @@ class OutputExpectation:
             Self for chaining.
         """
         if self._output != expected:
-            self._failures.append(f"Output does not match expected value")
+            self._failures.append("Output does not match expected value")
         return self
 
     def matches(self, pattern: str) -> "OutputExpectation":

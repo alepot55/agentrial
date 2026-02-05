@@ -1,6 +1,6 @@
 """Functional evaluators using custom Python functions."""
 
-from typing import Any, Callable
+from collections.abc import Callable
 
 from agentrial.types import AgentOutput, TrajectoryStep
 

@@ -1,6 +1,5 @@
 """Tests for the execution engine."""
 
-import pytest
 
 from agentrial.runner.engine import MultiTrialEngine
 from agentrial.types import (

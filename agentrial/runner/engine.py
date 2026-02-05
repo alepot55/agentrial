@@ -3,7 +3,8 @@
 import importlib
 import logging
 import time
-from typing import Any, Callable, Protocol
+from collections.abc import Callable
+from typing import Protocol
 
 from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn, TimeElapsedColumn
 
@@ -17,7 +18,6 @@ from agentrial.metrics.trajectory import attribute_failures
 from agentrial.types import (
     AgentInput,
     AgentOutput,
-    ConfidenceInterval,
     EvalResult,
     Suite,
     SuiteResult,
@@ -189,7 +189,10 @@ class MultiTrialEngine:
             # Update progress bar if active
             if self._progress is not None and self._current_task_id is not None:
                 # Format: [test 3/10] test-name trial 5/10
-                test_progress = f"[test {self._current_test_index}/{self._total_tests}]" if self._total_tests > 0 else ""
+                test_progress = (
+                    f"[test {self._current_test_index}/{self._total_tests}]"
+                    if self._total_tests > 0 else ""
+                )
                 self._progress.update(
                     self._current_task_id,
                     advance=1,

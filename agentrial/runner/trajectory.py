@@ -1,8 +1,9 @@
 """Trajectory recording and management."""
 
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Generator
+from typing import Any
 
 from agentrial.types import AgentMetadata, AgentOutput, StepType, TrajectoryStep
 

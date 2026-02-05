@@ -175,7 +175,8 @@ def attribute_failures(trials: list[TrialResult]) -> dict[str, Any]:
         fail_action = most_likely.get("most_common_fail", "unknown")
 
         recommendation = (
-            f"Step {most_likely_step} shows {significance} divergence (p={most_likely['p_value']:.3f}). "
+            f"Step {most_likely_step} shows {significance} divergence "
+            f"(p={most_likely['p_value']:.3f}). "
             f"Successful runs typically use '{success_action}', "
             f"while failed runs use '{fail_action}'."
         )

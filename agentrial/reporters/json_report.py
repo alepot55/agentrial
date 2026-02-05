@@ -1,7 +1,6 @@
 """JSON export for AgentEval results."""
 
 import json
-from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -168,7 +167,10 @@ def compare_reports(
                     "current_pass_rate": current_result["pass_rate"],
                     "baseline_pass_rate": baseline_result["pass_rate"],
                     "delta": delta,
-                    "status": "regression" if delta < -0.1 else ("improved" if delta > 0.1 else "stable"),
+                    "status": (
+                        "regression" if delta < -0.1
+                        else ("improved" if delta > 0.1 else "stable")
+                    ),
                 }
             )
         else:
@@ -196,7 +198,10 @@ def compare_reports(
             )
 
     return {
-        "overall_delta": current["summary"]["overall_pass_rate"] - baseline["summary"]["overall_pass_rate"],
+        "overall_delta": (
+            current["summary"]["overall_pass_rate"]
+            - baseline["summary"]["overall_pass_rate"]
+        ),
         "current_passed": current["summary"]["passed"],
         "baseline_passed": baseline["summary"]["passed"],
         "comparisons": comparisons,

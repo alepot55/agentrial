@@ -179,7 +179,7 @@ class TestBenjaminiHochbergCorrection:
         significant, adjusted = benjamini_hochberg_correction(p_values, alpha=0.05)
         assert all(significant)
         # Adjusted p-values should be larger than originals
-        for orig, adj in zip(p_values, adjusted):
+        for orig, adj in zip(p_values, adjusted, strict=True):
             assert adj >= orig
 
     def test_multiple_none_significant(self) -> None:

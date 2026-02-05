@@ -20,7 +20,9 @@ def exact_match(actual: str, expected: str, case_sensitive: bool = True) -> bool
     return actual == expected
 
 
-def contains(actual: str, substrings: list[str], case_sensitive: bool = True) -> tuple[bool, list[str]]:
+def contains(
+    actual: str, substrings: list[str], case_sensitive: bool = True
+) -> tuple[bool, list[str]]:
     """Check if actual output contains all expected substrings (AND logic).
 
     Args:
@@ -42,7 +44,9 @@ def contains(actual: str, substrings: list[str], case_sensitive: bool = True) ->
     return len(missing) == 0, missing
 
 
-def contains_any(actual: str, substrings: list[str], case_sensitive: bool = True) -> tuple[bool, str | None]:
+def contains_any(
+    actual: str, substrings: list[str], case_sensitive: bool = True
+) -> tuple[bool, str | None]:
     """Check if actual output contains at least one of the expected substrings (OR logic).
 
     Args:

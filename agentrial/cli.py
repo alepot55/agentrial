@@ -9,14 +9,14 @@ import click
 from rich.console import Console
 
 from agentrial import __version__
-from agentrial.config import Config, discover_test_files, load_config, load_suite
+from agentrial.config import discover_test_files, load_config, load_suite
 from agentrial.reporters.json_report import (
     compare_reports,
     export_json,
     load_json_report,
     save_json_report,
 )
-from agentrial.reporters.terminal import print_comparison, print_results
+from agentrial.reporters.terminal import print_results
 from agentrial.runner.engine import MultiTrialEngine, load_agent
 
 console = Console()
@@ -121,7 +121,7 @@ def run(
 
     # Override with CLI options
     effective_trials = trials or config.trials
-    effective_threshold = threshold or config.threshold
+    _ = threshold or config.threshold  # Used by suite override below
 
     # Find test files
     if test_path:
@@ -236,9 +236,11 @@ def compare(
     if regressions:
         console.print(f"\n[red]Found {len(regressions)} regression(s):[/red]")
         for r in regressions:
-            console.print(
-                f"  - {r['test_case']}: {r['baseline_pass_rate']:.1%} -> {r['current_pass_rate']:.1%} ({r['delta']:+.1%})"
+            msg = (
+                f"  - {r['test_case']}: {r['baseline_pass_rate']:.1%} -> "
+                f"{r['current_pass_rate']:.1%} ({r['delta']:+.1%})"
             )
+            console.print(msg)
         sys.exit(1)
 
     console.print("[green]No regressions detected.[/green]")
