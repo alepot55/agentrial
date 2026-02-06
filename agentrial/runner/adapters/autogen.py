@@ -152,7 +152,7 @@ class AutoGenAdapter(BaseAdapter):
             return ""
 
         try:
-            loop = asyncio.get_running_loop()
+            asyncio.get_running_loop()
             # Already inside an event loop — run in a thread to avoid blocking
             import concurrent.futures
 

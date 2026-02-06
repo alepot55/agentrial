@@ -1,5 +1,7 @@
 """Tests for LLM-as-Judge evaluator."""
 
+import logging
+
 from agentrial.evaluators.llm_judge import (
     CalibratedJudgment,
     GoldStandard,
@@ -302,7 +304,6 @@ def unittest_mock_handler(lgr: "logging.Logger"):
     def _ctx():
         handler = logging.Handler()
         handler.records: list[logging.LogRecord] = []  # type: ignore[attr-defined]
-        original_emit = handler.emit
         handler.emit = lambda record: handler.records.append(record)  # type: ignore[assignment]
         lgr.addHandler(handler)
         try:

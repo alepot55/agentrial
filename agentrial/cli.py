@@ -1002,7 +1002,7 @@ def monitor_cmd(
         baseline_costs.extend(metrics.get("cost", {}).get("values", []))
         baseline_latencies.extend(metrics.get("latency", {}).get("values", []))
 
-    detector = DriftDetector(
+    _detector = DriftDetector(
         baseline_pass_rate=baseline_pass_rate,
         baseline_costs=baseline_costs or None,
         baseline_latencies=baseline_latencies or None,

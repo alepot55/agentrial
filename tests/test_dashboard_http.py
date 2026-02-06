@@ -7,9 +7,9 @@ import pytest
 fastapi = pytest.importorskip("fastapi")
 httpx = pytest.importorskip("httpx")
 
-from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient  # noqa: E402
 
-from agentrial.dashboard.app import create_app
+from agentrial.dashboard.app import create_app  # noqa: E402
 
 
 @pytest.fixture
