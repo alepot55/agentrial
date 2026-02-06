@@ -12,6 +12,7 @@ from collections.abc import Callable
 from typing import Any
 from uuid import UUID
 
+from agentrial.runner.adapters.base import BaseAdapter
 from agentrial.runner.adapters.pricing import calculate_cost
 from agentrial.runner.otel import OTelTrajectoryCapture
 from agentrial.runner.trajectory import TrajectoryRecorder
@@ -268,7 +269,7 @@ class TrajectoryCallbackHandler:
         return self.get_total_tokens() * 0.000045
 
 
-class LangGraphAdapter:
+class LangGraphAdapter(BaseAdapter):
     """Adapter for LangGraph graphs.
 
     This adapter wraps a LangGraph CompiledGraph and converts its

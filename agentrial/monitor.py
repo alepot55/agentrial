@@ -380,7 +380,10 @@ class SlidingWindowDetector:
         n: int,
         expected_rate: float,
     ) -> float:
-        """Two-proportion z-test approximation.
+        """Proportion test: Fisher exact for small n, z-test for large n.
+
+        Uses Fisher's exact test when window_size < 30 (small-sample safe),
+        falls back to normal approximation for larger windows.
 
         Args:
             successes: Number of successes in window.
@@ -392,6 +395,10 @@ class SlidingWindowDetector:
         """
         if n == 0:
             return 1.0
+
+        # For small windows, use Fisher's exact test
+        if n < 30:
+            return self._fisher_exact(successes, n, expected_rate)
 
         observed_rate = successes / n
 
@@ -418,9 +425,81 @@ class SlidingWindowDetector:
         p_value = 2 * (1 - _normal_cdf(abs(z)))
         return p_value
 
+    def _fisher_exact(
+        self,
+        successes: int,
+        n: int,
+        expected_rate: float,
+    ) -> float:
+        """Fisher's exact test for 2x2 contingency table.
+
+        Constructs a table from observed vs baseline proportions and
+        computes a two-tailed p-value.
+        """
+        # Build 2x2 contingency table:
+        #           pass  fail
+        # window:    a     b
+        # baseline:  c     d
+        a = successes
+        b = n - successes
+        baseline_pass = round(expected_rate * self.baseline_n)
+        c = baseline_pass
+        d = self.baseline_n - baseline_pass
+
+        return _fisher_exact_2x2(a, b, c, d)
+
     def reset(self) -> None:
         """Reset the window."""
         self._window = []
+
+
+def _fisher_exact_2x2(a: int, b: int, c: int, d: int) -> float:
+    """Two-tailed Fisher's exact test for a 2x2 contingency table.
+
+    Uses the hypergeometric distribution to compute the exact p-value.
+    """
+    n = a + b + c + d
+    if n == 0:
+        return 1.0
+
+    def _log_factorial(x: int) -> float:
+        result = 0.0
+        for i in range(2, x + 1):
+            result += math.log(i)
+        return result
+
+    # P(table) under null
+    def _table_prob(aa: int, bb: int, cc: int, dd: int) -> float:
+        numerator = (
+            _log_factorial(aa + bb) + _log_factorial(cc + dd)
+            + _log_factorial(aa + cc) + _log_factorial(bb + dd)
+        )
+        denominator = (
+            _log_factorial(n)
+            + _log_factorial(aa) + _log_factorial(bb)
+            + _log_factorial(cc) + _log_factorial(dd)
+        )
+        return math.exp(numerator - denominator)
+
+    p_observed = _table_prob(a, b, c, d)
+
+    # Sum probabilities of all tables as extreme or more extreme
+    row1 = a + b
+    row2 = c + d
+    col1 = a + c
+
+    p_value = 0.0
+    for aa in range(0, min(row1, col1) + 1):
+        bb = row1 - aa
+        cc = col1 - aa
+        dd = row2 - cc
+        if bb < 0 or cc < 0 or dd < 0:
+            continue
+        p_table = _table_prob(aa, bb, cc, dd)
+        if p_table <= p_observed + 1e-12:
+            p_value += p_table
+
+    return min(1.0, p_value)
 
 
 def _normal_cdf(x: float) -> float:

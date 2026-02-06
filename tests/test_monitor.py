@@ -254,6 +254,27 @@ class TestSlidingWindowDetector:
             alert = detector.update(False)
             assert alert is None
 
+    def test_small_window_uses_fisher(self) -> None:
+        """Window < 30 should use Fisher exact test, not z-test."""
+        detector = SlidingWindowDetector(
+            baseline_pass_rate=0.9,
+            baseline_n=100,
+            window_size=10,
+            alpha=0.05,
+        )
+        # All failures in a 10-sample window
+        alerts = []
+        for _ in range(15):
+            alert = detector.update(False)
+            if alert:
+                alerts.append(alert)
+
+        assert len(alerts) > 0
+        assert alerts[0].method == "sliding_window"
+        # Fisher should detect this as significant (0/10 vs 0.9 baseline)
+        assert alerts[0].p_value is not None
+        assert alerts[0].p_value < 0.05
+
     def test_reset(self) -> None:
         detector = SlidingWindowDetector(
             baseline_pass_rate=0.8, window_size=10

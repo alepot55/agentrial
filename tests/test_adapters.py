@@ -498,3 +498,11 @@ class TestLazyImports:
 
         assert BaseAdapter is not None
         assert wrap_langgraph_agent is not None
+
+    def test_langgraph_adapter_inherits_base(self) -> None:
+        """LangGraphAdapter should be an instance of BaseAdapter (H6)."""
+        from agentrial.runner.adapters.base import BaseAdapter
+        from agentrial.runner.adapters.langgraph import LangGraphAdapter
+
+        adapter = LangGraphAdapter(graph=MagicMock())
+        assert isinstance(adapter, BaseAdapter)

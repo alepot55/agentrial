@@ -276,6 +276,32 @@ def compute_krippendorff_alpha(
     return max(-1.0, min(1.0, alpha))
 
 
+def _t_ppf_975(df: int) -> float:
+    """Return the 97.5th percentile of the t-distribution (two-tailed 95% CI).
+
+    Uses a lookup table for small df and falls back to the normal
+    approximation (z=1.96) for df >= 120.
+    """
+    _table = {
+        1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776,
+        5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306,
+        9: 2.262, 10: 2.228, 11: 2.201, 12: 2.179,
+        13: 2.160, 14: 2.145, 15: 2.131, 16: 2.120,
+        17: 2.110, 18: 2.101, 19: 2.093, 20: 2.086,
+        25: 2.060, 30: 2.042, 40: 2.021, 60: 2.000,
+        120: 1.980,
+    }
+    if df in _table:
+        return _table[df]
+    if df > 120:
+        return 1.96  # large sample: t → z
+    # For unlisted df <= 120, use nearest lower entry
+    for k in sorted(_table.keys(), reverse=True):
+        if k <= df:
+            return _table[k]
+    return 12.706  # df=1 fallback (shouldn't reach here)
+
+
 def calibrate_bias(
     judge_fn: Callable[[str, str], JudgmentResult],
     gold: GoldStandard,
@@ -391,9 +417,19 @@ class LLMJudge:
 
         # Compute confidence interval for the score
         if len(scores) >= 2:
-            std_err = statistics.stdev(scores) / (len(scores) ** 0.5)
-            ci_lower = max(1.0, mean_score - 1.96 * std_err)
-            ci_upper = min(5.0, mean_score + 1.96 * std_err)
+            m = len(scores)
+            std_err = statistics.stdev(scores) / (m ** 0.5)
+            # Use t-distribution for small samples (exact for any M)
+            t_crit = _t_ppf_975(m - 1)
+            if m < 5:
+                logger.warning(
+                    "LLM Judge: only %d repeats — CI is wide "
+                    "(t=%.2f vs z=1.96). Consider repeats>=5.",
+                    m,
+                    t_crit,
+                )
+            ci_lower = max(1.0, mean_score - t_crit * std_err)
+            ci_upper = min(5.0, mean_score + t_crit * std_err)
         else:
             ci_lower = ci_upper = mean_score
 

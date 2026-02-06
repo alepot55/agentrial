@@ -200,13 +200,18 @@ from agentrial import expect
 
 result = agent(AgentInput(query="Book a flight to Rome"))
 
-expect(result) \
-    .succeeded() \
-    .output.contains("confirmed", "Rome") \
-    .tool_called("search_flights") \
-    .step(0).params_contain(destination="FCO") \
+e = expect(result).succeeded() \
+    .tool_called("search_flights", params_contain={"destination": "FCO"}) \
     .cost_below(0.15) \
     .latency_below(5000)
+
+# Output checks return OutputExpectation (separate chain)
+e.output.contains("confirmed", "Rome")
+
+# Step checks return StepExpectation (separate chain)
+e.step(0).tool_name("search_flights").params_contain(destination="FCO")
+
+assert e.passed()
 ```
 
 | Method | Description |
@@ -215,8 +220,9 @@ expect(result) \
 | `.output.contains(*strings)` | Output contains all substrings |
 | `.output.equals(string)` | Exact match |
 | `.output.matches(regex)` | Regex match |
-| `.tool_called(name, params={})` | Tool was called with params |
+| `.tool_called(name, params_contain={})` | Tool was called with params |
 | `.step(i).tool_name(name)` | Step i called named tool |
+| `.step(i).params_contain(**kw)` | Step i had params matching kw |
 | `.cost_below(max_usd)` | Cost under threshold |
 | `.latency_below(max_ms)` | Latency under threshold |
 | `.tokens_below(max_tokens)` | Tokens under threshold |
@@ -235,9 +241,22 @@ agentrial run tests/                    # Run tests in specific directory
 agentrial run --trials 20 --threshold 0.9  # Override settings
 agentrial run -o results.json           # Export JSON report
 agentrial run --json                    # JSON to stdout
+agentrial run --flamegraph              # Show trajectory flame graphs
+agentrial run --html flamegraph.html    # Export flame graph as HTML
+agentrial run --judge                   # Enable LLM-as-Judge evaluation
+agentrial run --update-snapshots        # Save snapshot baseline
 agentrial compare results.json -b baseline.json  # Regression detection
 agentrial baseline results.json         # Save baseline
 agentrial config                        # Show configuration
+agentrial snapshot update               # Run and save snapshot
+agentrial snapshot check                # Compare against snapshot
+agentrial security scan --mcp-config c.json  # MCP security scan
+agentrial pareto --models m1,m2,m3      # Pareto frontier analysis
+agentrial prompt track prompt.txt       # Track prompt version
+agentrial prompt diff v1 v2             # Diff prompt versions
+agentrial prompt list                   # List prompt versions
+agentrial monitor --baseline snap.json  # Configure drift monitoring
+agentrial dashboard                     # Launch web dashboard
 ```
 
 | Flag | Short | Description | Default |
@@ -247,6 +266,10 @@ agentrial config                        # Show configuration
 | `--threshold` | `-t` | Min pass rate (0-1) | `0.85` |
 | `--output` | `-o` | JSON output path | — |
 | `--json` | | JSON to stdout | `false` |
+| `--flamegraph` | | Show trajectory flame graphs | `false` |
+| `--html` | | Export flame graph HTML | — |
+| `--judge` | | Enable LLM-as-Judge | `false` |
+| `--update-snapshots` | | Save as snapshot baseline | `false` |
 
 ---
 
@@ -314,29 +337,48 @@ When tests fail, agentrial analyzes trajectory divergence:
 
 ```
 agentrial/
-├── cli.py                  # Click CLI — run, compare, baseline, config, init
+├── cli.py                  # Click CLI — run, compare, baseline, config, init, etc.
 ├── config.py               # YAML config loading and test file discovery
 ├── types.py                # AgentInput, AgentOutput, TestCase, Suite, etc.
+├── snapshots.py            # Statistical snapshot testing and comparison
+├── pareto.py               # Cost-accuracy Pareto frontier analysis
+├── prompts.py              # Prompt version control (track, diff, list)
+├── monitor.py              # Production drift detection (CUSUM, Page-Hinkley, KS)
+├── pytest_plugin.py        # @agent_test decorator for pytest integration
 ├── runner/
 │   ├── engine.py           # MultiTrialEngine — orchestrates N trials per test
 │   ├── trajectory.py       # TrajectoryRecorder — captures steps, tokens, cost
 │   ├── otel.py             # OpenTelemetry span capture for any framework
 │   └── adapters/
-│       ├── base.py         # BaseAdapter protocol
+│       ├── base.py         # BaseAdapter protocol + FunctionAdapter
 │       ├── langgraph.py    # LangGraph adapter (callbacks + trajectory)
+│       ├── crewai.py       # CrewAI adapter
+│       ├── autogen.py      # AutoGen adapter (v0.4+ and legacy)
+│       ├── pydantic_ai.py  # Pydantic AI adapter
+│       ├── openai_agents.py # OpenAI Agents SDK adapter
+│       ├── smolagents.py   # Hugging Face smolagents adapter
 │       └── pricing.py      # Model pricing for 40+ LLMs
 ├── evaluators/
 │   ├── exact.py            # contains, regex, tool_called, exact_match
 │   ├── expect.py           # Fluent assertion API
 │   ├── functional.py       # Custom check functions, range checks
+│   ├── llm_judge.py        # Calibrated LLM-as-Judge evaluator
+│   ├── multi_agent.py      # Multi-agent evaluation
 │   └── step_eval.py        # Per-step and trajectory evaluation
 ├── metrics/
 │   ├── basic.py            # Pass rate, cost, latency, token efficiency
 │   ├── statistical.py      # Wilson CI, bootstrap, Fisher, Mann-Whitney, BH
 │   └── trajectory.py       # Failure attribution via divergence analysis
-└── reporters/
-    ├── terminal.py         # Rich terminal output
-    └── json_report.py      # JSON export, load, comparison
+├── reporters/
+│   ├── terminal.py         # Rich terminal output
+│   ├── json_report.py      # JSON export, load, comparison
+│   └── flamegraph.py       # Trajectory flame graphs (terminal + HTML)
+├── security/
+│   └── scanner.py          # MCP security scanner (5 vulnerability classes)
+└── dashboard/
+    ├── app.py              # FastAPI cloud dashboard
+    ├── models.py           # Dashboard data models
+    └── store.py            # Persistent storage backend
 ```
 
 ---
@@ -346,6 +388,11 @@ agentrial/
 | Framework | Status | Notes |
 |---|---|---|
 | **LangGraph** | Native adapter | Full trajectory, callbacks, token tracking |
+| **CrewAI** | Native adapter | Task-level trajectory, crew cost tracking |
+| **AutoGen** | Native adapter | v0.4+ (autogen-agentchat) and legacy pyautogen |
+| **Pydantic AI** | Native adapter | Tool calls, response parts, token usage |
+| **OpenAI Agents SDK** | Native adapter | Runner integration, tool call capture |
+| **smolagents (HF)** | Native adapter | Dict and object log formats |
 | **Any OTel-instrumented agent** | Supported | Automatic span capture via OTel SDK |
 | **Custom** | Supported | `AgentInput -> AgentOutput` protocol |
 

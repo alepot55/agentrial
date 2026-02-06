@@ -430,6 +430,20 @@ class TestScanMCPConfig:
         with pytest.raises(ValueError, match="Either config_path or config"):
             scan_mcp_config()
 
+    def test_malformed_json_raises_value_error(self) -> None:
+        """Malformed JSON should raise ValueError with clear message."""
+        import pytest
+
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as f:
+            # Write invalid JSON (trailing comma)
+            f.write('{"mcpServers": {"s": {"tools": [],}}}')
+            f.flush()
+
+            with pytest.raises(ValueError, match="Malformed JSON"):
+                scan_mcp_config(config_path=f.name)
+
     def test_full_scan_with_multiple_issues(self) -> None:
         config = {
             "mcpServers": {

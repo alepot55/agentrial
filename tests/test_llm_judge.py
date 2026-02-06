@@ -6,6 +6,7 @@ from agentrial.evaluators.llm_judge import (
     LLMJudge,
     Rubric,
     _parse_judge_response,
+    _t_ppf_975,
     compute_krippendorff_alpha,
 )
 
@@ -229,3 +230,82 @@ class TestCalibratedJudgment:
             reasoning_samples=["Good", "Correct"],
         )
         assert len(j.reasoning_samples) == 2
+
+
+class TestTDistribution:
+    """Tests for t-distribution CI (H1 fix)."""
+
+    def test_t_ppf_975_known_values(self) -> None:
+        assert _t_ppf_975(1) == 12.706
+        assert _t_ppf_975(2) == 4.303
+        assert _t_ppf_975(30) == 2.042
+        assert _t_ppf_975(120) == 1.980
+
+    def test_t_ppf_975_large_df_fallback(self) -> None:
+        # df > 120 should use 1.96 fallback
+        assert _t_ppf_975(500) == 1.96
+
+    def test_ci_uses_t_distribution(self) -> None:
+        """With M=3, CI should be wider than z=1.96 would give."""
+        call_count = 0
+
+        def varying_llm(prompt: str) -> str:
+            nonlocal call_count
+            scores = [3.0, 4.0, 5.0]
+            score = scores[call_count % len(scores)]
+            call_count += 1
+            return f"SCORE: {score}\nREASONING: Test."
+
+        rubric = Rubric(criteria="Test")
+        judge = LLMJudge(rubric=rubric, llm_fn=varying_llm, repeats=3)
+        result = judge.evaluate("q", "a")
+
+        # With t(df=2)=4.303 vs z=1.96, CI should be wider
+        # stdev([3,4,5]) = 1.0, std_err = 1/sqrt(3) ≈ 0.577
+        # z-CI width: 2 * 1.96 * 0.577 ≈ 2.26
+        # t-CI width: 2 * 4.303 * 0.577 ≈ 4.97
+        ci_width = result.score_ci[1] - result.score_ci[0]
+        # t-CI should be wider than z-CI would be
+        z_ci_width = 2 * 1.96 * 1.0 / (3 ** 0.5)
+        assert ci_width > z_ci_width
+
+    def test_ci_warning_for_small_m(self) -> None:
+        """Verify warning is logged when M < 5."""
+        import logging
+
+        rubric = Rubric(criteria="Test")
+        judge = LLMJudge(
+            rubric=rubric,
+            llm_fn=lambda p: "SCORE: 4\nREASONING: ok",
+            repeats=3,
+        )
+
+        logger = logging.getLogger("agentrial.evaluators.llm_judge")
+        with unittest_mock_handler(logger) as handler:
+            result = judge.evaluate("q", "a")
+            assert result.mean_score == 4.0
+            # Check that a warning was logged about small M
+            warnings = [
+                r for r in handler.records if r.levelno == logging.WARNING
+            ]
+            assert any("only 3 repeats" in r.getMessage() for r in warnings)
+
+
+def unittest_mock_handler(lgr: "logging.Logger"):
+    """Context manager that attaches a handler to capture log records."""
+    import contextlib
+    import logging
+
+    @contextlib.contextmanager
+    def _ctx():
+        handler = logging.Handler()
+        handler.records: list[logging.LogRecord] = []  # type: ignore[attr-defined]
+        original_emit = handler.emit
+        handler.emit = lambda record: handler.records.append(record)  # type: ignore[assignment]
+        lgr.addHandler(handler)
+        try:
+            yield handler
+        finally:
+            lgr.removeHandler(handler)
+
+    return _ctx()

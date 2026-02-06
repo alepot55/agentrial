@@ -964,9 +964,11 @@ def prompt_list() -> None:
 )
 @click.option("--dry-run", is_flag=True, help="Show detector config without running")
 @click.option("--window", type=int, default=50, help="Sliding window size")
-@click.option("--threshold", type=float, default=5.0, help="CUSUM threshold")
+@click.option(
+    "--cusum-threshold", type=float, default=5.0, help="CUSUM detection threshold"
+)
 def monitor_cmd(
-    baseline_path: str, dry_run: bool, window: int, threshold: float
+    baseline_path: str, dry_run: bool, window: int, cusum_threshold: float
 ) -> None:
     """Configure production drift monitoring from a baseline snapshot."""
     import json as json_mod
@@ -989,14 +991,14 @@ def monitor_cmd(
         baseline_pass_rate=baseline_pass_rate,
         baseline_costs=baseline_costs or None,
         baseline_latencies=baseline_latencies or None,
-        cusum_threshold=threshold,
+        cusum_threshold=cusum_threshold,
         window_size=window,
     )
 
     if dry_run:
         console.print("[bold]Drift detector configuration:[/bold]")
         console.print(f"  Baseline pass rate: {baseline_pass_rate:.0%}")
-        console.print(f"  CUSUM threshold: {threshold}")
+        console.print(f"  CUSUM threshold: {cusum_threshold}")
         console.print(f"  Window size: {window}")
         console.print(f"  Baseline costs: {len(baseline_costs)} samples")
         console.print(f"  Baseline latencies: {len(baseline_latencies)} samples")

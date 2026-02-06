@@ -122,6 +122,26 @@ class MultiTrialEngine:
             )
             failures.append(f"Agent exception: {e}")
 
+        # Guard against None or wrong-type agent returns
+        if not isinstance(output, AgentOutput):
+            from agentrial.types import AgentMetadata
+
+            logger.warning(
+                "Agent returned %s instead of AgentOutput in trial %d",
+                type(output).__name__,
+                trial_index,
+            )
+            output = AgentOutput(
+                output=str(output) if output is not None else "",
+                steps=[],
+                metadata=AgentMetadata(),
+                success=False,
+                error=f"Agent returned {type(output).__name__} instead of AgentOutput",
+            )
+            failures.append(
+                f"Agent returned invalid type: {type(output).__name__}"
+            )
+
         duration_ms = (time.time() - start_time) * 1000
 
         # Check if agent reported failure

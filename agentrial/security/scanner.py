@@ -550,7 +550,14 @@ def scan_mcp_config(
             raise FileNotFoundError(f"MCP config not found: {path}")
 
         with open(path) as f:
-            config = json.load(f)
+            try:
+                config = json.load(f)
+            except json.JSONDecodeError as exc:
+                raise ValueError(
+                    f"Malformed JSON in MCP config '{path}': {exc}. "
+                    f"Check for trailing commas, missing quotes, "
+                    f"or invalid syntax."
+                ) from exc
 
     scanner = MCPSecurityScanner(custom_trusted_tools=custom_trusted_tools)
     return scanner.scan(config)
