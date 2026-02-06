@@ -2,7 +2,7 @@
   "name": "agentrial-vscode",
   "displayName": "Agentrial",
   "description": "Statistical evaluation of AI agents — inline results, flamegraphs, and snapshot regression detection",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "alepot55",
   "license": "MIT",
   "icon": "icon.png",
