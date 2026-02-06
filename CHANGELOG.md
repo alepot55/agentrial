@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0-alpha.2] - 2026-02-06
+
+### Fixed
+
+- **CLI crash on pytest files**: `agentrial run` no longer crashes when encountering
+  pytest files that use `importorskip` or raise `BaseException` subclasses.
+- **Noisy auto-discovery**: `agentrial run` without arguments now only discovers YAML
+  test files (`test_*.yml`, `test_*.yaml`), avoiding false positives from pytest files.
+  Python suite files can still be passed explicitly.
+- **6 ruff lint errors**: Fixed unused variables (`detector`, `loop`, `original_emit`),
+  missing `import logging`, and E402 import ordering in test files.
+
 ## [0.2.0-alpha.1] - 2026-02-06
 
 ### Added
