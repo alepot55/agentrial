@@ -44,6 +44,23 @@ export interface SecurityFinding {
     recommendation: string;
 }
 
+export interface SnapshotComparison {
+    passed: boolean;
+    regressions: number;
+    improvements: number;
+    unchanged: number;
+    cases: SnapshotCaseComparison[];
+}
+
+export interface SnapshotCaseComparison {
+    name: string;
+    status: string;
+    current_pass_rate: number;
+    baseline_pass_rate: number;
+    delta: number;
+    p_value: number;
+}
+
 export class AgentrialRunner {
     private pythonPath: string;
 
@@ -77,10 +94,13 @@ export class AgentrialRunner {
     }
 
     /**
-     * Compare current results with snapshot.
+     * Compare current results with snapshot baseline.
      */
-    async compareSnapshot(suiteFile: string): Promise<any> {
-        const cmd = `${this.pythonPath} -m agentrial run "${suiteFile}" --json --compare-snapshot`;
+    async compareSnapshot(suiteFile: string, trials?: number): Promise<SnapshotComparison> {
+        let cmd = `${this.pythonPath} -m agentrial snapshot check "${suiteFile}" --json`;
+        if (trials) {
+            cmd += ` --trials ${trials}`;
+        }
         const result = await this.execute(cmd);
         return JSON.parse(result);
     }

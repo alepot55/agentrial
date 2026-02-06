@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-02-06
+
+### Added
+- **Agent Reliability Score (ARS)**: Composite 0-100 reliability metric with 6 weighted components (accuracy, consistency, cost efficiency, latency, trajectory quality, recovery). CLI: `agentrial ars`
+- **Benchmark Registry**: Publish and verify evaluation results with SHA-256 integrity (`agentrial publish`, `agentrial verify`)
+- **Eval Packs**: Plugin infrastructure for domain-specific evaluation packages via Python entry points (`agentrial packs list`)
+- **VS Code Extension**: Marketplace-ready extension with suite explorer, flame graph viewer, snapshot comparison, security scan
+- **45+ model pricing**: Expanded cost tracking to cover Anthropic, OpenAI, Google, Mistral, Meta, DeepSeek models
+- **CLI integration tests**: 15 commands verified with automated testing
+- **Reporter tests**: Terminal and JSON reporter coverage
+- **OTel tests**: OpenTelemetry span capture verification
+- **Dashboard store tests**: Persistence layer coverage
+
+### Fixed
+- `action.yml` default config changed from `agenteval.yml` to `agentrial.yml`
+- Legacy `agenteval` references removed from config.py and github_action.py
+- VS Code extension `compareSnapshot()` implemented (was stub)
+- VS Code extension threshold now configurable (was hardcoded 85%)
+
+### Changed
+- Test count: 349 → 438
+- Total CLI commands: 10 → 15
+- Model pricing table: 20 → 45 models
+
 ## [0.2.0-alpha.2] - 2026-02-06
 
 ### Fixed
