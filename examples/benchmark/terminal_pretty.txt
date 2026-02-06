@@ -1,0 +1,26 @@
+
+────────────────────────────────── real-agent-benchmark — PASSED ───────────────────────────────────
+                    Model: claude-3-haiku-20240307 | Threshold: 80% | Trials: 20                    
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Test Case                 ┃ Pass Rate ┃      95% CI      ┃ Avg Cost ┃ Avg Latency ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ simple-math               │       70% │ (48.1% - 85.5%)  │  $0.0005 │      4734ms │
+│ capital-lookup            │      100% │ (83.9% - 100.0%) │  $0.0005 │      3114ms │
+│ multi-step-calculation    │       95% │ (76.4% - 99.1%)  │  $0.0013 │      9618ms │
+│ unit-conversion           │      100% │ (83.9% - 100.0%) │  $0.0011 │      8847ms │
+│ compound-reasoning        │       95% │ (76.4% - 99.1%)  │  $0.0011 │      6681ms │
+│ ambiguous-query           │      100% │ (83.9% - 100.0%) │  $0.0009 │      7463ms │
+│ unnecessary-tool-call     │      100% │ (83.9% - 100.0%) │  $0.0002 │      3349ms │
+└───────────────────────────┴───────────┴──────────────────┴──────────┴─────────────┘
+
+Failure: simple-math: {"most_likely_step": null, "step_divergences": [{"step_index": 0, "p_value": 
+1.0, "successful_actions": {"llm_call:llm_c
+Failure: multi-step-calculation: {"most_likely_step": null, "step_divergences": [{"step_index": 0, 
+"p_value": 1.0, "successful_actions": {"llm_call:llm_c
+Failure: compound-reasoning: {"most_likely_step": null, "step_divergences": [{"step_index": 0, 
+"p_value": 1.0, "successful_actions": {"llm_call:llm_c
+
+Overall Pass Rate: 94.3% (89.1% - 97.1%)
+Total Cost: $0.1139
+Total Duration: 876.2s

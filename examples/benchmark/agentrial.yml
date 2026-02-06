@@ -1,0 +1,55 @@
+suite: real-agent-benchmark
+agent: examples.benchmark.agent.agent
+trials: 50
+threshold: 0.80
+
+cases:
+  # Easy — should be ~95-100% pass rate
+  - name: simple-math
+    input:
+      query: "What is 247 * 18?"
+    expected:
+      output_contains: ["4446"]
+
+  # Easy — direct knowledge lookup
+  - name: capital-lookup
+    input:
+      query: "What is the capital of South Korea?"
+    expected:
+      output_contains: ["Seoul"]
+
+  # Medium — requires tool selection + composition
+  - name: multi-step-calculation
+    input:
+      query: "If I have 15 items at $23.50 each, and there's a 8.5% sales tax, what's the total?"
+    expected:
+      output_contains_any: ["382.46", "382.4625", "382.47"]
+
+  # Medium — unit conversion + reasoning
+  - name: unit-conversion
+    input:
+      query: "Convert 72 degrees Fahrenheit to Celsius, then tell me if that's above or below the boiling point of water."
+    expected:
+      output_contains: ["22"]
+      output_contains_any: ["below", "under", "not", "lower", "well below", "far below"]
+
+  # Hard — requires multi-step reasoning and correct tool sequence
+  - name: compound-reasoning
+    input:
+      query: "A recipe serves 4 people and needs 2.5 cups of flour. I'm cooking for 7 people. How many grams of flour do I need? (1 cup of flour = 125 grams)"
+    expected:
+      output_contains_any: ["546", "547", "546.875", "546.88"]
+
+  # Hard — ambiguous, tests robustness
+  - name: ambiguous-query
+    input:
+      query: "What's the difference between 1000 and the number of days in 3 years?"
+    expected:
+      output_contains_any: ["95", "96", "1095", "1096"]
+
+  # Adversarial — prompt that often causes unnecessary tool use
+  - name: unnecessary-tool-call
+    input:
+      query: "What color is the sky on a clear day?"
+    expected:
+      output_contains_any: ["blue", "Blue"]
