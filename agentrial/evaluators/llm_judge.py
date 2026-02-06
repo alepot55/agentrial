@@ -13,10 +13,13 @@ Falls back to rule-based evaluation when no LLM is configured.
 
 from __future__ import annotations
 
+import logging
 import statistics
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -131,6 +134,57 @@ def _parse_judge_response(response: str) -> JudgmentResult:
             reasoning = line_stripped[10:].strip()
 
     return JudgmentResult(score=score, reasoning=reasoning, raw_response=response)
+
+
+def _rule_based_evaluate(prompt: str) -> str:
+    """Rule-based fallback when no LLM is available.
+
+    Examines the judge prompt to produce a deterministic score.
+    """
+    # Extract the agent output section from the prompt
+    output_section = ""
+    in_output = False
+    for line in prompt.split("\n"):
+        if line.strip() == "## Agent Output":
+            in_output = True
+            continue
+        if line.strip().startswith("## ") and in_output:
+            break
+        if in_output:
+            output_section += line + "\n"
+
+    output_text = output_section.strip()
+
+    if not output_text:
+        return (
+            "SCORE: 1\n"
+            "REASONING: Rule-based: agent produced empty output."
+        )
+
+    # Check for error indicators
+    error_words = ["error", "exception", "failed", "i don't know", "cannot"]
+    has_errors = any(w in output_text.lower() for w in error_words)
+
+    if has_errors:
+        return (
+            "SCORE: 2\n"
+            "REASONING: Rule-based: output contains error indicators or "
+            "failure signals."
+        )
+
+    # Non-empty, no errors — adequate output
+    if len(output_text) > 50:
+        return (
+            "SCORE: 4\n"
+            "REASONING: Rule-based: output is substantive and "
+            "appears well-formed."
+        )
+
+    return (
+        "SCORE: 3\n"
+        "REASONING: Rule-based: output present but brief. "
+        "Install litellm for more accurate LLM-based judging."
+    )
 
 
 def compute_krippendorff_alpha(
@@ -282,6 +336,7 @@ class LLMJudge:
         self.repeats = max(1, repeats)
         self.gold_standard = gold_standard
         self._calibration_bias: float | None = None
+        self._rule_based = False
 
     def _call_llm(self, prompt: str) -> str:
         """Call the LLM with a prompt."""
@@ -298,12 +353,16 @@ class LLMJudge:
                 temperature=0.3,
             )
             return response.choices[0].message.content or ""
-        except ImportError as err:
-            raise RuntimeError(
-                "No LLM function provided and litellm is not installed. "
-                "Either pass llm_fn to LLMJudge or install litellm: "
-                "pip install litellm"
-            ) from err
+        except ImportError:
+            # Fall back to rule-based evaluation
+            if not self._rule_based:
+                logger.warning(
+                    "No LLM provider available. Using rule-based judge "
+                    "(less accurate). Install litellm for LLM-based "
+                    "judging: pip install litellm"
+                )
+                self._rule_based = True
+            return _rule_based_evaluate(prompt)
 
     def _judge_once(self, query: str, output: str) -> JudgmentResult:
         """Run a single judgment."""

@@ -186,15 +186,15 @@ class TestLLMJudge:
         assert result.mean_score == 3.5
         assert result.alpha == 1.0
 
-    def test_no_llm_raises(self) -> None:
-        """Test that missing LLM function raises appropriate error."""
+    def test_no_llm_falls_back_to_rule_based(self) -> None:
+        """Test that missing LLM function falls back to rule-based judge."""
         rubric = Rubric(criteria="Check")
         judge = LLMJudge(rubric=rubric, llm_fn=None, repeats=1)
 
-        import pytest
-
-        with pytest.raises(RuntimeError, match="litellm"):
-            judge.evaluate("q", "a")
+        result = judge.evaluate("q", "a")
+        assert judge._rule_based is True
+        assert result.mean_score >= 1.0
+        assert result.mean_score <= 5.0
 
 
 class TestCalibratedJudgment:

@@ -19,6 +19,7 @@ Usage:
 from __future__ import annotations
 
 import functools
+import inspect
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
@@ -182,6 +183,9 @@ def agent_test(
             result = _run_agent_test(config, func)
             return result
 
+        # Override signature so pytest doesn't try to inject
+        # the original function's parameters as fixtures
+        wrapper.__signature__ = inspect.Signature(parameters=[])
         wrapper._agentrial_config = config  # type: ignore[attr-defined]
         return wrapper
 

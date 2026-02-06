@@ -107,6 +107,11 @@ def main(ctx: click.Context, verbose: bool) -> None:
     is_flag=True,
     help="Save results as new snapshot baseline",
 )
+@click.option(
+    "--judge",
+    is_flag=True,
+    help="Enable LLM-as-Judge evaluation of agent outputs",
+)
 @click.pass_context
 def run(
     ctx: click.Context,
@@ -119,6 +124,7 @@ def run(
     flamegraph: bool,
     html_path: str | None,
     update_snapshots: bool,
+    judge: bool,
 ) -> None:
     """Run evaluation suite(s).
 
@@ -254,6 +260,31 @@ def run(
             html_content = export_suite_flamegraphs_html(suite_result)
             Path(html_path).write_text(html_content)
             console.print(f"[dim]Flame graph saved to {html_path}[/dim]")
+
+        # LLM-as-Judge evaluation
+        if judge and not json_output:
+            from agentrial.evaluators.llm_judge import LLMJudge, Rubric
+
+            llm_judge = LLMJudge(
+                rubric=Rubric(criteria="Evaluate correctness and quality of the agent output."),
+                repeats=3,
+            )
+            console.print("\n[bold]LLM-as-Judge evaluation:[/bold]")
+            for eval_result in suite_result.results:
+                case_name = eval_result.test_case.name
+                # Judge the last trial's output
+                last_trial = eval_result.trials[-1] if eval_result.trials else None
+                if last_trial:
+                    query = eval_result.test_case.input.query
+                    judgment = llm_judge.evaluate(query, last_trial.agent_output.output)
+                    judge_type = "rule-based" if llm_judge._rule_based else "LLM"
+                    style = "green" if judgment.passed else "red"
+                    console.print(
+                        f"  {case_name}: [{style}]{judgment.mean_score:.1f}/5.0[/{style}] "
+                        f"(alpha={judgment.alpha:.2f}, {judge_type})"
+                    )
+                    if judgment.reasoning_samples:
+                        console.print(f"    [dim]{judgment.reasoning_samples[0]}[/dim]")
 
         # Snapshot handling
         if update_snapshots:
@@ -835,6 +866,9 @@ def pareto_cmd(models: str, trials: int, test_path: str | None) -> None:
     model_results = {}
     for model_name in model_list:
         console.print(f"  Running model: {model_name}...")
+        # Inject model name into each test case's context
+        for case in suite.cases:
+            case.input.context["model"] = model_name
         engine = MultiTrialEngine(trials=trials, show_progress=False)
         agent = load_agent(suite.agent)
         result = engine.run_suite(agent, suite)
