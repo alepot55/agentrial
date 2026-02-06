@@ -1060,6 +1060,165 @@ def dashboard_cmd(port: int, host: str, data_dir: str | None) -> None:
     uvicorn.run(app, host=host, port=port)
 
 
+# --- ARS command ---
+
+
+@main.command("ars")
+@click.argument("results_path", type=click.Path(exists=True))
+@click.option("--cost-ceiling", type=float, default=1.0, help="Max expected cost per case")
+@click.option(
+    "--latency-ceiling", type=float, default=30000.0,
+    help="Max expected latency in ms",
+)
+def ars_cmd(results_path: str, cost_ceiling: float, latency_ceiling: float) -> None:
+    """Compute Agent Reliability Score from a results JSON file.
+
+    ARS is a composite 0-100 score measuring accuracy, consistency,
+    cost efficiency, latency, trajectory quality, and recovery.
+
+    Examples:
+
+        agentrial ars results.json
+
+        agentrial ars results.json --cost-ceiling 0.5
+    """
+    from agentrial.ars import compute_ars_from_json
+
+    report = load_json_report(results_path)
+    breakdown = compute_ars_from_json(
+        report, cost_ceiling=cost_ceiling, latency_ceiling_ms=latency_ceiling
+    )
+
+    style = "green" if breakdown.score >= 70 else "yellow" if breakdown.score >= 50 else "red"
+    console.print(f"\n[bold]Agent Reliability Score:[/bold] [{style}]{breakdown.score}/100[/{style}]")
+    console.print()
+    console.print(f"  Accuracy:           {breakdown.accuracy:5.1f}  (40%)")
+    console.print(f"  Consistency:        {breakdown.consistency:5.1f}  (20%)")
+    console.print(f"  Cost efficiency:    {breakdown.cost_efficiency:5.1f}  (10%)")
+    console.print(f"  Latency:            {breakdown.latency:5.1f}  (10%)")
+    console.print(f"  Trajectory quality: {breakdown.trajectory_quality:5.1f}  (10%)")
+    console.print(f"  Recovery:           {breakdown.recovery:5.1f}  (10%)")
+
+
+# --- Packs commands ---
+
+
+@main.group()
+def packs() -> None:
+    """Manage eval packs."""
+
+
+@packs.command("list")
+def packs_list() -> None:
+    """List available eval packs (installed and runtime)."""
+    from agentrial.packs import discover_packs, list_runtime_packs
+
+    installed = discover_packs()
+    runtime = list_runtime_packs()
+
+    if not installed and not runtime:
+        console.print("[dim]No eval packs found.[/dim]")
+        console.print(
+            "\nInstall packs with pip, e.g.:"
+            "\n  pip install agentrial-pack-rag"
+        )
+        return
+
+    if installed:
+        console.print("[bold]Installed packs:[/bold]")
+        for pack in installed:
+            suites_str = ", ".join(pack.suites) if pack.suites else "no suites"
+            ver = f" v{pack.version}" if pack.version else ""
+            console.print(f"  {pack.name}{ver}  ({suites_str})")
+            if pack.description:
+                console.print(f"    {pack.description}")
+
+    if runtime:
+        console.print("[bold]Runtime packs:[/bold]")
+        for name in runtime:
+            console.print(f"  {name}")
+
+
+# --- Registry commands ---
+
+
+@main.command("publish")
+@click.argument("results_path", type=click.Path(exists=True))
+@click.option("--agent-name", required=True, help="Agent name")
+@click.option("--agent-version", required=True, help="Agent version")
+@click.option("--registry-dir", type=click.Path(), help="Registry directory")
+def publish_cmd(
+    results_path: str,
+    agent_name: str,
+    agent_version: str,
+    registry_dir: str | None,
+) -> None:
+    """Publish benchmark results to the local registry.
+
+    Examples:
+
+        agentrial publish results.json --agent-name my-agent --agent-version 1.0.0
+    """
+    from agentrial.ars import compute_ars_from_json
+    from agentrial.registry import BenchmarkRegistry
+
+    report = load_json_report(results_path)
+    ars = compute_ars_from_json(report)
+    summary = report.get("summary", {})
+
+    registry = BenchmarkRegistry(registry_dir=registry_dir)
+    entry = registry.publish(
+        agent_name=agent_name,
+        agent_version=agent_version,
+        suite_name=summary.get("suite_name", "unknown"),
+        ars=ars,
+        trials=summary.get("trials", 0),
+        pass_rate=summary.get("overall_pass_rate", 0.0),
+        total_cost=summary.get("total_cost", 0.0),
+        total_duration_ms=summary.get("total_duration_ms", 0.0),
+    )
+
+    console.print(f"[green]Published {agent_name} v{agent_version}[/green]")
+    console.print(f"  ARS: {entry.ars_score}/100")
+    console.print(f"  Hash: {entry.hash}")
+
+
+@main.command("verify")
+@click.option("--agent-name", required=True, help="Agent name")
+@click.option("--agent-version", required=True, help="Agent version")
+@click.option("--suite-name", required=True, help="Suite name")
+@click.option("--registry-dir", type=click.Path(), help="Registry directory")
+def verify_cmd(
+    agent_name: str,
+    agent_version: str,
+    suite_name: str,
+    registry_dir: str | None,
+) -> None:
+    """Verify a published benchmark result.
+
+    Checks the integrity hash of a registry entry.
+    """
+    from agentrial.registry import BenchmarkRegistry
+
+    registry = BenchmarkRegistry(registry_dir=registry_dir)
+    entry = registry.get_entry(agent_name, agent_version, suite_name)
+
+    if not entry:
+        console.print(f"[red]Entry not found: {agent_name} v{agent_version} / {suite_name}[/red]")
+        sys.exit(1)
+
+    valid = registry.verify(entry)
+    if valid:
+        console.print(f"[green]Verified: {agent_name} v{agent_version}[/green]")
+        console.print(f"  ARS: {entry.ars_score}/100")
+        console.print(f"  Pass rate: {entry.pass_rate:.0%}")
+        console.print(f"  Hash: {entry.hash}")
+    else:
+        console.print(f"[red]INTEGRITY CHECK FAILED for {agent_name} v{agent_version}[/red]")
+        console.print("The entry may have been tampered with.")
+        sys.exit(1)
+
+
 # --- Helper ---
 
 
