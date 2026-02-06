@@ -167,8 +167,11 @@ def run(
     if not test_files:
         console.print("[red]No test files found.[/red]")
         console.print(
-            "Agentrial looks for files matching test_*.yml, test_*.yaml, "
-            "or test_*.py in the current directory and tests/."
+            "Agentrial looks for files matching test_*.yml or test_*.yaml "
+            "in the current directory and tests/."
+        )
+        console.print(
+            "[dim]Python suite files (test_*.py) must be passed explicitly.[/dim]"
         )
         console.print("\nTo get started quickly, run:")
         console.print("  [bold]agentrial init[/bold]  — creates a working sample project")

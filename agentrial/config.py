@@ -185,7 +185,12 @@ def load_suite_from_python(python_path: Path) -> Suite:
         raise ValueError(f"Could not load Python file: {python_path}")
 
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    try:
+        spec.loader.exec_module(module)
+    except BaseException as e:
+        if isinstance(e, (KeyboardInterrupt, SystemExit)):
+            raise
+        raise ValueError(f"Could not execute {python_path}: {e}") from e
 
     # Look for a Suite instance in the module
     suite = getattr(module, "suite", None)
@@ -223,9 +228,12 @@ def load_suite(path: Path) -> Suite:
 def discover_test_files(directory: Path, pattern: str = "test_*.yml") -> list[Path]:
     """Discover test files in a directory.
 
-    Looks for test files with the following patterns:
+    Looks for YAML test files with the following patterns:
     - test_*.yml / test_*.yaml (standard test files)
-    - test_*.py (Python test files)
+
+    Python test files (test_*.py) are NOT auto-discovered to avoid
+    picking up pytest files. Pass them explicitly to ``agentrial run``
+    if they define a Suite.
 
     Note: agentrial.yml/yaml is treated as CONFIG only, not a test file.
 
@@ -239,6 +247,4 @@ def discover_test_files(directory: Path, pattern: str = "test_*.yml") -> list[Pa
     files = list(directory.glob(pattern))
     # Also look for YAML variants
     files.extend(directory.glob("test_*.yaml"))
-    # Also look for Python test files
-    files.extend(directory.glob("test_*.py"))
     return sorted(set(files))  # Remove duplicates and sort
