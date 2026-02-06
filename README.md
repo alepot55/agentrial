@@ -7,8 +7,8 @@
     <a href="https://pypi.org/project/agentrial/"><img alt="PyPI" src="https://img.shields.io/pypi/v/agentrial?color=blue"></a>
     <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
     <a href="https://www.python.org/downloads/"><img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11+-blue.svg"></a>
-    <a href="https://github.com/alepot55/agentrial/actions"><img alt="Tests" src="https://img.shields.io/badge/tests-438%20passed-brightgreen"></a>
-    <a href="https://marketplace.visualstudio.com/items?itemName=alepot55.agentrial"><img alt="VS Code" src="https://img.shields.io/badge/VS%20Code-marketplace-blue"></a>
+    <a href="https://github.com/alepot55/agentrial/actions"><img alt="Tests" src="https://img.shields.io/badge/tests-450%20passed-brightgreen"></a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=alepot55.agentrial-vscode"><img alt="VS Code" src="https://img.shields.io/badge/VS%20Code-marketplace-blue"></a>
   </p>
 </p>
 
@@ -68,7 +68,7 @@ agentrial fills that gap: open-source, free, local-first, works with any framewo
 
 **Regression detection.** Fisher exact test on pass rates, Mann-Whitney U on cost/latency. Catches statistically significant drops between versions. Exit code 1 blocks your PR in CI.
 
-**Agent Reliability Score.** A single 0-100 composite metric that combines pass consistency, cost efficiency, failure recovery, step stability, LLM-as-Judge agreement, and security posture. One number to track across releases — like Lighthouse for agents.
+**Agent Reliability Score.** A single 0-100 composite metric that combines accuracy (40%), consistency (20%), cost efficiency (10%), latency (10%), trajectory quality (10%), and recovery (10%). One number to track across releases — like Lighthouse for agents.
 
 **Production monitoring.** Deploy `agentrial monitor` as a cron job or sidecar. CUSUM and Page-Hinkley detectors catch drift in pass rate, cost, and latency. Kolmogorov-Smirnov test detects distribution shifts. Alerts before users notice.
 
@@ -248,8 +248,8 @@ Track, diff, and compare prompt versions with statistical significance testing b
 ### Benchmark registry
 
 ```bash
-agentrial publish results.json --author yourname
-agentrial verify benchmark.json
+agentrial publish results.json --agent-name my-agent --agent-version 1.0.0
+agentrial verify --agent-name my-agent --agent-version 1.0.0 --suite-name my-suite
 ```
 
 Publish evaluation results as verifiable benchmark files with SHA-256 integrity checksums.
@@ -278,7 +278,7 @@ Domain-specific evaluation packages via Python entry points. Install a pack, get
 
 ## VS Code extension
 
-Browse test suites, run evaluations, view flame graphs, and compare snapshots from your editor. Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alepot55.agentrial) or search "agentrial" in extensions.
+Browse test suites, run evaluations, view flame graphs, and compare snapshots from your editor. Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alepot55.agentrial-vscode) or search "agentrial" in extensions.
 
 ---
 
@@ -316,7 +316,8 @@ agentrial pareto --models m1,m2,m3          # Cost-accuracy Pareto frontier
 agentrial prompt track/diff/list            # Prompt version control
 agentrial monitor --baseline snap.json      # Production drift detection
 agentrial ars results.json                  # Agent Reliability Score
-agentrial publish / verify                  # Benchmark registry
+agentrial publish results.json --agent-name X --agent-version Y
+agentrial verify --agent-name X --agent-version Y --suite-name Z
 agentrial packs list                        # Installed eval packs
 agentrial dashboard                         # Local dashboard
 ```
@@ -347,7 +348,7 @@ agentrial dashboard                         # Local dashboard
 git clone https://github.com/alepot55/agentrial.git
 cd agentrial
 pip install -e ".[dev]"
-pytest                    # 438 tests
+pytest                    # 450 tests
 ruff check .
 mypy agentrial/
 ```
