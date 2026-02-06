@@ -2,10 +2,13 @@
 
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 
-AGENTRIAL = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".venv", "bin", "agentrial")
+# Use .venv binary if available (local dev), otherwise find in PATH (CI)
+_venv_bin = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".venv", "bin", "agentrial")
+AGENTRIAL = _venv_bin if os.path.isfile(_venv_bin) else shutil.which("agentrial") or "agentrial"
 
 
 def run_cli(*args: str, cwd: str | None = None, timeout: int = 30) -> subprocess.CompletedProcess:
