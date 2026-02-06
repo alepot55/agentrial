@@ -1,4 +1,4 @@
-"""Configuration loading for AgentEval."""
+"""Configuration loading for Agentrial."""
 
 import logging
 from dataclasses import dataclass
@@ -22,7 +22,7 @@ DEFAULT_CONFIG_FILENAME = "agentrial.yml"
 
 @dataclass
 class Config:
-    """Global configuration for AgentEval.
+    """Global configuration for Agentrial.
 
     Attributes:
         trials: Default number of trials per test case.

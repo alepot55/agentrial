@@ -1,4 +1,4 @@
-"""Core type definitions for AgentEval."""
+"""Core type definitions for Agentrial."""
 
 from collections.abc import Callable
 from dataclasses import dataclass, field

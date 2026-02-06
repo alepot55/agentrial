@@ -1,4 +1,4 @@
-"""Output reporters for AgentEval."""
+"""Output reporters for Agentrial."""
 
 from agentrial.reporters.json_report import export_json, save_json_report
 from agentrial.reporters.terminal import print_results

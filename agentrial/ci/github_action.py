@@ -1,4 +1,4 @@
-"""GitHub Actions integration for AgentEval."""
+"""GitHub Actions integration for Agentrial."""
 
 from typing import Any
 
@@ -8,7 +8,7 @@ def generate_action_yaml(
     trials: int = 10,
     python_version: str = "3.11",
 ) -> str:
-    """Generate a GitHub Actions workflow YAML for AgentEval.
+    """Generate a GitHub Actions workflow YAML for Agentrial.
 
     Args:
         threshold: Minimum pass rate to pass CI.
@@ -18,7 +18,7 @@ def generate_action_yaml(
     Returns:
         YAML content as a string.
     """
-    return f"""name: AgentEval
+    return f"""name: Agentrial
 
 on:
   pull_request:
@@ -41,12 +41,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install agenteval
+        pip install agentrial
         pip install -r requirements.txt
 
-    - name: Run AgentEval
+    - name: Run Agentrial
       run: |
-        agenteval run --trials {trials} --threshold {threshold} --output results.json
+        agentrial run --trials {trials} --threshold {threshold} --output results.json
       env:
         OPENAI_API_KEY: ${{{{ secrets.OPENAI_API_KEY }}}}
 
@@ -61,7 +61,7 @@ jobs:
       continue-on-error: true
       run: |
         if [ -f baseline.json ]; then
-          agenteval compare results.json --baseline baseline.json
+          agentrial compare results.json --baseline baseline.json
         fi
 """
 
@@ -70,7 +70,7 @@ def format_pr_comment(results: dict[str, Any]) -> str:
     """Format results as a GitHub PR comment.
 
     Args:
-        results: JSON results from AgentEval.
+        results: JSON results from Agentrial.
 
     Returns:
         Markdown-formatted comment.
@@ -84,7 +84,7 @@ def format_pr_comment(results: dict[str, Any]) -> str:
     status_emoji = "white_check_mark" if passed else "x"
 
     lines = [
-        f"## AgentEval Results :{status_emoji}:",
+        f"## Agentrial Results :{status_emoji}:",
         "",
         f"**Status**: {status}",
         f"**Overall Pass Rate**: {pass_rate:.1%} "
@@ -123,7 +123,7 @@ def post_pr_comment(
     Requires the `requests` library.
 
     Args:
-        results: JSON results from AgentEval.
+        results: JSON results from Agentrial.
         repo: Repository in "owner/repo" format.
         pr_number: Pull request number.
         token: GitHub token with PR comment permissions.
@@ -152,7 +152,7 @@ def get_exit_code(results: dict[str, Any]) -> int:
     """Get appropriate exit code for CI based on results.
 
     Args:
-        results: JSON results from AgentEval.
+        results: JSON results from Agentrial.
 
     Returns:
         0 if passed, 1 if failed.

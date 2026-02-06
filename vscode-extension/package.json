@@ -1,0 +1,108 @@
+{
+  "name": "agentrial-vscode",
+  "displayName": "Agentrial",
+  "description": "Statistical evaluation of AI agents — inline results, flamegraphs, and snapshot regression detection",
+  "version": "0.1.0",
+  "publisher": "agentrial",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Testing",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "agents",
+    "evaluation",
+    "testing",
+    "llm"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/agentrial.yml",
+    "workspaceContains:**/agentrial.yaml",
+    "workspaceContains:.agentrial/**"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentrial.runSuite",
+        "title": "Agentrial: Run Test Suite"
+      },
+      {
+        "command": "agentrial.runTestCase",
+        "title": "Agentrial: Run Test Case"
+      },
+      {
+        "command": "agentrial.showFlamegraph",
+        "title": "Agentrial: Show Flamegraph"
+      },
+      {
+        "command": "agentrial.compareSnapshot",
+        "title": "Agentrial: Compare with Snapshot"
+      },
+      {
+        "command": "agentrial.securityScan",
+        "title": "Agentrial: MCP Security Scan"
+      }
+    ],
+    "configuration": {
+      "title": "Agentrial",
+      "properties": {
+        "agentrial.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Path to Python executable with agentrial installed"
+        },
+        "agentrial.defaultTrials": {
+          "type": "number",
+          "default": 10,
+          "description": "Default number of trials for test runs"
+        },
+        "agentrial.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh results when test files change"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "agentrial",
+          "title": "Agentrial",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "agentrial": [
+        {
+          "id": "agentrial.suites",
+          "name": "Test Suites"
+        },
+        {
+          "id": "agentrial.results",
+          "name": "Results"
+        },
+        {
+          "id": "agentrial.snapshots",
+          "name": "Snapshots"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0"
+  }
+}

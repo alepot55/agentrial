@@ -1,4 +1,4 @@
-"""Evaluators for AgentEval."""
+"""Evaluators for Agentrial."""
 
 from agentrial.evaluators.exact import contains, exact_match, regex_match
 from agentrial.evaluators.expect import expect

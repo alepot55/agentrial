@@ -1,1 +1,1 @@
-"""AgentEval test suite."""
+"""Agentrial test suite."""

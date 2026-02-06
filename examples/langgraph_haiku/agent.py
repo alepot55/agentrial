@@ -1,4 +1,4 @@
-"""LangGraph agent with three tools for AgentEval testing.
+"""LangGraph agent with three tools for Agentrial testing.
 
 This agent uses Claude 3 Haiku via langchain-anthropic and has tools for:
 - Mathematical calculations

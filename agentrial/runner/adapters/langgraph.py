@@ -1,4 +1,4 @@
-"""LangGraph adapter for AgentEval.
+"""LangGraph adapter for Agentrial.
 
 This adapter wraps LangGraph graphs and captures their execution
 trajectory using LangChain callback handlers (primary) or OpenTelemetry
@@ -31,7 +31,7 @@ class TrajectoryCallbackHandler:
     """LangChain callback handler for capturing trajectory.
 
     This handler intercepts LangChain/LangGraph events and records
-    them as trajectory steps for AgentEval analysis.
+    them as trajectory steps for Agentrial analysis.
     """
 
     def __init__(self) -> None:
@@ -272,7 +272,7 @@ class LangGraphAdapter:
     """Adapter for LangGraph graphs.
 
     This adapter wraps a LangGraph CompiledGraph and converts its
-    execution into the AgentEval trajectory format.
+    execution into the Agentrial trajectory format.
 
     Primary mode: Uses LangChain callback handlers to intercept events.
     Fallback mode: Uses stream events or OTel spans if callbacks unavailable.
@@ -589,7 +589,7 @@ def wrap_langgraph_agent(
     use_callbacks: bool = True,
     use_otel: bool = False,
 ) -> Callable[[AgentInput], AgentOutput]:
-    """Wrap a LangGraph CompiledGraph for use with AgentEval.
+    """Wrap a LangGraph CompiledGraph for use with Agentrial.
 
     This function creates an adapter that captures the execution trajectory
     of a LangGraph graph using LangChain callback handlers (primary method)
@@ -613,7 +613,7 @@ def wrap_langgraph_agent(
         graph = StateGraph(...)
         compiled = graph.compile()
 
-        # Wrap for AgentEval
+        # Wrap for Agentrial
         agent = wrap_langgraph_agent(compiled)
 
         # Use in test suite

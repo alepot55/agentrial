@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">agentrial</h1>
   <p align="center">
-    <strong>Statistical evaluation framework for AI agents</strong>
+    <strong>The pytest for AI agents. Statistical evaluation with confidence intervals and failure attribution.</strong>
   </p>
   <p align="center">
     <a href="https://pypi.org/project/agentrial/"><img alt="PyPI" src="https://img.shields.io/pypi/v/agentrial?color=blue"></a>
@@ -10,86 +10,84 @@
   </p>
 </p>
 
-Your agent passes Monday, fails Wednesday. **agentrial** tells you why.
-
-AI agents are non-deterministic. A single test run tells you nothing. agentrial runs your agent N times, computes confidence intervals on pass rates, tracks real API costs, and pinpoints which step in the trajectory causes failures — so you ship agents that work reliably, not just once.
-
-```
-╭─────────────────────────────────────────────────────────────────────────────╮
-│ my-agent-tests - PASSED                                                     │
-╰─────────────────────────────────────-──────────────────── Threshold: 85.0% ─╯
-┏━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Test Case              ┃ Pass Rate┃ 95% CI          ┃ Avg Cost ┃ Avg Latency┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━┩
-│ easy-multiply          │   100.0% │ (72.2%-100.0%)  │  $0.0005 │      1.59s │
-│ medium-inference       │   100.0% │ (72.2%-100.0%)  │  $0.0006 │      2.61s │
-│ hard-multi-step        │   100.0% │ (72.2%-100.0%)  │  $0.0010 │      3.52s │
-└────────────────────────┴──────────┴─────────────────┴──────────┴────────────┘
-
-Overall Pass Rate: 100.0% (72.2%-100.0%)
-Total Cost: $0.06
-```
+Your agent passes Monday, fails Wednesday. Same prompt, same model. **agentrial** tells you why.
 
 ---
 
-## Table of Contents
-
-- [Why agentrial?](#why-agentrial)
-- [Quick Start](#quick-start)
-- [Writing Tests](#writing-tests)
-- [Wrapping Your Agent](#wrapping-your-agent)
-- [CLI Reference](#cli-reference)
-- [Fluent Assertion API](#fluent-assertion-api)
-- [CI/CD Integration](#cicd-integration)
-- [Statistical Methods](#statistical-methods)
-- [Architecture](#architecture)
-- [Real-World Results](#real-world-results)
-- [Supported Models](#supported-models)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
-## Why agentrial?
-
-Testing AI agents is fundamentally different from testing deterministic software. The same input can produce different tool calls, different reasoning paths, and different outputs. A single "it passed" run is meaningless.
-
-agentrial solves this with:
-
-| Feature | What it does |
-|---|---|
-| **Multi-trial execution** | Run every test N times automatically |
-| **Wilson confidence intervals** | Statistically accurate pass rates, even with small sample sizes |
-| **Step-level failure attribution** | Identifies *which tool call* diverges between passed and failed runs |
-| **Real cost tracking** | Computes actual API costs from model metadata (supports 40+ models) |
-| **Regression detection** | Fisher exact test catches reliability drops between versions |
-| **CI/CD integration** | GitHub Action that blocks PRs when agent quality degrades |
-
----
-
-## Quick Start
-
-### Install
+## Quickstart
 
 ```bash
 pip install agentrial
+agentrial init
+agentrial run
 ```
 
-For LangGraph support:
+That's it. You'll see real results in seconds:
 
-```bash
-pip install agentrial[langgraph]
+```
+╭──────────────────────────────────────────────────────────────────────╮
+│ sample-demo - PASSED                                                 │
+╰───────────────────────────────────────────────────── Threshold: 80% ─╯
+┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━┓
+┃ Test Case        ┃ Pass Rate ┃ 95% CI           ┃ Avg Cost ┃ Avg Latency ┃
+┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━┩
+│ greeting         │    100.0% │ (56.6%-100.0%)   │  $0.0000 │         0ms │
+│ capital-france   │    100.0% │ (56.6%-100.0%)   │  $0.0000 │         0ms │
+│ capital-japan    │    100.0% │ (56.6%-100.0%)   │  $0.0000 │         0ms │
+│ basic-math       │    100.0% │ (56.6%-100.0%)   │  $0.0000 │         0ms │
+└──────────────────┴───────────┴──────────────────┴──────────┴─────────────┘
+
+Overall Pass Rate: 100.0% (85.0%-100.0%)
+Total Cost: $0.0000
 ```
 
-### Create a test file
+Replace `sample_agent.py` with your own agent, update `tests/test_sample.yml`, and you're evaluating real agents.
 
-Create `agentrial.yml` in your project root:
+---
+
+## What it does
+
+- **Multi-trial execution** — Run every test N times automatically. A single pass means nothing for non-deterministic agents.
+- **Wilson confidence intervals** — Statistically accurate pass rates, even with small samples and extreme proportions (0% or 100%).
+- **Step-level failure attribution** — Pinpoints *which tool call* diverges between passing and failing runs using Fisher exact test.
+- **Real cost tracking** — Actual API costs from model metadata, 40+ models supported across Anthropic, OpenAI, Google, Mistral.
+- **Regression detection** — Fisher exact test catches reliability drops between versions. Blocks PRs in CI when quality degrades.
+- **Local-first** — Your data never leaves your machine. No accounts, no SaaS, no telemetry.
+
+---
+
+## Why this exists
+
+Every agent framework ships with benchmarks showing 90%+ accuracy. But run those same agents 100 times on the same task, and you'll see pass rates drop to 60-80% with wide variance. The benchmarks measure one run; production sees thousands.
+
+No existing tool gives you statistically rigorous, framework-agnostic agent testing that runs in CI/CD. LangSmith requires a paid account and locks you to LangChain. Promptfoo doesn't do multi-trial with confidence intervals. DeepEval and Arize don't do trajectory-level failure attribution. agentrial fills that gap: open-source, free, local-first, works with any agent framework.
+
+---
+
+## How it compares
+
+| Feature                      | agentrial | Promptfoo | LangSmith | DeepEval | Arize |
+|------------------------------|-----------|-----------|-----------|----------|-------|
+| Multi-trial with CI          | **Free**  | No        | $39/mo    | No       | No    |
+| Confidence intervals         | Yes       | No        | No        | No       | No    |
+| Trajectory step analysis     | Yes       | No        | Partial   | No       | Yes   |
+| Failure attribution          | Yes       | No        | No        | No       | No    |
+| Framework-agnostic (OTel)    | Yes       | Yes       | No        | Yes      | Yes   |
+| Free CI/CD integration       | Yes       | Yes       | No        | No       | No    |
+| Local-first (no data leaves) | Yes       | Yes       | No        | No       | No    |
+| Cost-per-correct-answer      | Yes       | No        | No        | No       | No    |
+
+---
+
+## Writing Tests
+
+Tests are YAML files. Define what your agent receives and what it should produce:
 
 ```yaml
 suite: my-agent-tests
 agent: my_module.agent       # Python import path to your wrapped agent
 trials: 10
-threshold: 0.85              # Minimum pass rate to consider the suite passing
+threshold: 0.85              # Minimum pass rate
 
 cases:
   - name: basic-math
@@ -99,82 +97,50 @@ cases:
       output_contains: ["555"]
       tool_calls:
         - tool: calculate
-```
 
-### Run
-
-```bash
-agentrial run
-```
-
-Or initialize a sample project:
-
-```bash
-agentrial init
-```
-
----
-
-## Writing Tests
-
-Tests are defined in YAML files (`agentrial.yml`, or any `test_*.yml` / `test_*.yaml` file).
-
-### Suite-level configuration
-
-```yaml
-suite: my-suite              # Suite name
-agent: my_module.agent       # Python import path to wrapped agent callable
-trials: 10                   # Number of trials per test case
-threshold: 0.85              # Minimum overall pass rate (0.0 - 1.0)
-```
-
-### Test case options
-
-Each test case supports a range of assertion types:
-
-```yaml
-cases:
-  - name: test-name
+  - name: capital-lookup
     input:
-      query: "User question"
-      context:                   # Optional context dict passed to agent
-        user_id: "123"
-
+      query: "What is the capital of Japan?"
     expected:
-      # String matching (AND logic — all must be present)
-      output_contains: ["expected", "words"]
+      output_contains: ["Tokyo"]
 
-      # String matching (OR logic — at least one must be present)
-      output_contains_any: ["option1", "option2"]
-
-      # Regex pattern
-      regex: "\\d+ results found"
-
-      # Tool call assertions
-      tool_calls:
-        - tool: search
-          params_contain:
-            query: "expected search term"
-
-    # Cost and latency constraints (per trial)
+  - name: error-handling
+    input:
+      query: "Divide 10 by 0"
+    expected:
+      output_contains_any: ["undefined", "cannot", "error"]
     max_cost: 0.05
-    max_latency: 5000          # milliseconds
-
-    # Step-level expectations
-    step_expectations:
-      - step_index: 0
-        tool_name: search
-        params_contain:
-          query: "search term"
-        output_contains: ["result"]
+    max_latency_ms: 5000
 ```
 
-### Multiple test files
+### All assertion types
 
-agentrial auto-discovers test files in the given directory:
+```yaml
+expected:
+  output_contains: ["word1", "word2"]        # AND — all must be present
+  output_contains_any: ["option1", "option2"] # OR — at least one
+  exact_match: "exact output string"
+  regex: "\\d+ results found"
+  tool_calls:
+    - tool: search
+      params_contain:
+        query: "expected term"
+
+# Per-step expectations
+step_expectations:
+  - step_index: 0
+    tool_name: search
+    params_contain:
+      query: "search term"
+    output_contains: ["result"]
+```
+
+### Test discovery
+
+agentrial auto-discovers test files:
 
 ```bash
-agentrial run tests/          # Discovers test_*.yml, test_*.yaml, test_*.py
+agentrial run tests/          # Finds test_*.yml, test_*.yaml, test_*.py
 agentrial run agentrial.yml   # Run a specific file
 ```
 
@@ -182,7 +148,7 @@ agentrial run agentrial.yml   # Run a specific file
 
 ## Wrapping Your Agent
 
-agentrial needs a callable that takes `AgentInput` and returns `AgentOutput`. Use an adapter to wrap your framework's agent.
+agentrial needs a callable: `AgentInput -> AgentOutput`. Use an adapter for your framework.
 
 ### LangGraph
 
@@ -200,137 +166,93 @@ def calculate(expression: str) -> str:
 llm = ChatAnthropic(model="claude-3-haiku-20240307", temperature=0)
 graph = create_react_agent(llm, tools=[calculate])
 
-# Export this — it's what agentrial.yml points to
+# This is what your YAML points to
 agent = wrap_langgraph_agent(graph)
 ```
 
-Then reference it in your YAML:
-
-```yaml
-agent: my_module.agent
-```
-
-The LangGraph adapter automatically captures:
-- Full trajectory (every tool call and LLM response)
-- Token usage per step
-- Real API cost from model pricing data
-- Execution duration
+The LangGraph adapter automatically captures full trajectory, token usage, real API cost, and execution duration.
 
 ### Custom agents
 
-Implement the agent protocol directly:
+Implement the protocol directly:
 
 ```python
 from agentrial.types import AgentInput, AgentOutput, AgentMetadata
 
 def agent(input: AgentInput) -> AgentOutput:
-    # Your agent logic here
+    # Your agent logic
     return AgentOutput(
         output="result",
         steps=[],
-        metadata=AgentMetadata(
-            total_tokens=100,
-            cost=0.001,
-            duration_ms=500.0,
-        ),
+        metadata=AgentMetadata(total_tokens=100, cost=0.001, duration_ms=500.0),
         success=True,
     )
 ```
 
 ---
 
-## CLI Reference
-
-```bash
-# Run all tests in current directory
-agentrial run
-
-# Run specific file or directory
-agentrial run tests/
-agentrial run agentrial.yml
-
-# Override trial count and threshold
-agentrial run --trials 20 --threshold 0.9
-
-# Export results to JSON
-agentrial run -o results.json
-
-# Output JSON to stdout
-agentrial run --json
-
-# Compare current results against a baseline
-agentrial compare results.json --baseline baseline.json
-
-# Save a baseline
-agentrial baseline results.json -o baseline.json
-
-# Show current configuration
-agentrial config
-
-# Initialize sample project
-agentrial init
-```
-
-### Options
-
-| Flag | Short | Description | Default |
-|---|---|---|---|
-| `--config` | `-c` | Path to config file | `agentrial.yml` |
-| `--trials` | `-n` | Number of trials per test case | `10` |
-| `--threshold` | `-t` | Minimum pass rate (0.0-1.0) | `0.85` |
-| `--output` | `-o` | JSON output file path | — |
-| `--json` | | Output JSON to stdout | `false` |
-
----
-
 ## Fluent Assertion API
 
-For Python-defined tests, agentrial provides a chainable assertion builder:
+For Python-defined tests:
 
 ```python
 from agentrial import expect
 
 result = agent(AgentInput(query="Book a flight to Rome"))
 
-# Chain assertions fluently
 expect(result) \
     .succeeded() \
     .output.contains("confirmed", "Rome") \
     .tool_called("search_flights") \
     .step(0).params_contain(destination="FCO") \
     .cost_below(0.15) \
-    .latency_below(5000) \
-    .tokens_below(3000) \
-    .trajectory_length(min_steps=2, max_steps=10)
+    .latency_below(5000)
 ```
-
-### Available assertions
 
 | Method | Description |
 |---|---|
-| `.succeeded()` | Agent execution completed without error |
-| `.output.contains(*strings)` | Output contains all substrings (AND) |
-| `.output.equals(string)` | Output exactly matches string |
-| `.output.matches(regex)` | Output matches regex pattern |
-| `.output.length_between(min, max)` | Output length within bounds |
-| `.tool_called(name, params_contain={})` | Specific tool was called with params |
-| `.step(i).tool_name(name)` | Step at index is a call to named tool |
-| `.step(i).params_contain(**kv)` | Step parameters contain expected values |
-| `.step(i).output_contains(*strings)` | Step output contains substrings |
-| `.cost_below(max_usd)` | Total cost under threshold |
-| `.latency_below(max_ms)` | Total latency under threshold |
-| `.tokens_below(max_tokens)` | Total tokens under threshold |
-| `.trajectory_length(min, max)` | Number of steps within bounds |
-| `.passed()` | Returns `True` if all assertions passed |
-| `.get_failures()` | Returns list of failure messages |
+| `.succeeded()` | Agent completed without error |
+| `.output.contains(*strings)` | Output contains all substrings |
+| `.output.equals(string)` | Exact match |
+| `.output.matches(regex)` | Regex match |
+| `.tool_called(name, params={})` | Tool was called with params |
+| `.step(i).tool_name(name)` | Step i called named tool |
+| `.cost_below(max_usd)` | Cost under threshold |
+| `.latency_below(max_ms)` | Latency under threshold |
+| `.tokens_below(max_tokens)` | Tokens under threshold |
+| `.trajectory_length(min, max)` | Step count within bounds |
+| `.passed()` | Returns `True` if all pass |
+| `.get_failures()` | Returns failure messages |
+
+---
+
+## CLI Reference
+
+```bash
+agentrial init                          # Create sample project (ready to run)
+agentrial run                           # Run all tests in current directory
+agentrial run tests/                    # Run tests in specific directory
+agentrial run --trials 20 --threshold 0.9  # Override settings
+agentrial run -o results.json           # Export JSON report
+agentrial run --json                    # JSON to stdout
+agentrial compare results.json -b baseline.json  # Regression detection
+agentrial baseline results.json         # Save baseline
+agentrial config                        # Show configuration
+```
+
+| Flag | Short | Description | Default |
+|---|---|---|---|
+| `--config` | `-c` | Config file path | `agentrial.yml` |
+| `--trials` | `-n` | Trials per test case | `10` |
+| `--threshold` | `-t` | Min pass rate (0-1) | `0.85` |
+| `--output` | `-o` | JSON output path | — |
+| `--json` | | JSON to stdout | `false` |
 
 ---
 
 ## CI/CD Integration
 
-### GitHub Actions (simple)
-
-Add to `.github/workflows/agent-eval.yml`:
+### GitHub Actions
 
 ```yaml
 name: Agent Evaluation
@@ -344,8 +266,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install agentrial[langgraph] langchain-anthropic
-      - run: pip install -e .
+      - run: pip install agentrial && pip install -e .
       - run: agentrial run --trials 10 --threshold 0.85 -o results.json
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -358,16 +279,12 @@ jobs:
 
 ### Regression detection in CI
 
-Run against a saved baseline to catch reliability drops:
-
 ```yaml
       - run: agentrial run -o results.json
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       - run: agentrial compare results.json --baseline baseline.json
 ```
 
-The `compare` command uses Fisher's exact test (p < 0.05) to detect statistically significant regressions. Exit code 1 if a regression is found.
+Fisher's exact test (p < 0.05) detects statistically significant regressions. Exit code 1 blocks the PR.
 
 ---
 
@@ -375,34 +292,21 @@ The `compare` command uses Fisher's exact test (p < 0.05) to detect statisticall
 
 agentrial uses real statistical tests, not simple averages.
 
-### Pass rate confidence intervals
-
-**Wilson score interval** — accurate for small sample sizes and extreme proportions (0% or 100%), unlike normal approximation which fails at boundaries.
-
-```
-10 trials, 9 passes → 90.0% (59.6% - 98.2%)
-10 trials, 10 passes → 100.0% (72.2% - 100.0%)
-```
-
-### Cost and latency confidence intervals
-
-**Bootstrap resampling** (500 iterations) — non-parametric, no normality assumption required. Reports mean with 95% CI for cost and latency metrics.
-
-### Regression detection
-
-| Test | Use case |
+| Method | What it does |
 |---|---|
-| **Fisher exact test** | Compare pass rates between two runs (p < 0.05) |
-| **Mann-Whitney U test** | Compare cost/latency distributions |
-| **Benjamini-Hochberg correction** | Controls false discovery rate when comparing multiple metrics |
+| **Wilson score interval** | Confidence intervals for pass rates — accurate at boundaries (0%, 100%) and small samples |
+| **Bootstrap resampling** | CI for cost/latency — non-parametric, no normality assumption (500 iterations) |
+| **Fisher exact test** | Regression detection — compares pass rates between two runs (p < 0.05) |
+| **Mann-Whitney U test** | Compares cost/latency distributions between versions |
+| **Benjamini-Hochberg** | Controls false discovery rate when comparing multiple metrics |
 
-### Step-level failure attribution
+### Failure attribution
 
-When tests fail, agentrial analyzes trajectory divergence between passing and failing trials:
+When tests fail, agentrial analyzes trajectory divergence:
 1. Groups trials by pass/fail
-2. At each step, compares the distribution of tool calls
-3. Uses Fisher exact test to identify the step with statistically significant divergence
-4. Reports the divergent step with a human-readable recommendation
+2. At each step, compares distribution of tool calls
+3. Fisher exact test identifies the step with significant divergence
+4. Reports the divergent step with a recommendation
 
 ---
 
@@ -412,14 +316,14 @@ When tests fail, agentrial analyzes trajectory divergence between passing and fa
 agentrial/
 ├── cli.py                  # Click CLI — run, compare, baseline, config, init
 ├── config.py               # YAML config loading and test file discovery
-├── types.py                # Dataclasses: AgentInput, AgentOutput, TestCase, etc.
+├── types.py                # AgentInput, AgentOutput, TestCase, Suite, etc.
 ├── runner/
 │   ├── engine.py           # MultiTrialEngine — orchestrates N trials per test
 │   ├── trajectory.py       # TrajectoryRecorder — captures steps, tokens, cost
 │   ├── otel.py             # OpenTelemetry span capture for any framework
 │   └── adapters/
 │       ├── base.py         # BaseAdapter protocol
-│       ├── langgraph.py    # LangGraph adapter with callback-based capture
+│       ├── langgraph.py    # LangGraph adapter (callbacks + trajectory)
 │       └── pricing.py      # Model pricing for 40+ LLMs
 ├── evaluators/
 │   ├── exact.py            # contains, regex, tool_called, exact_match
@@ -431,40 +335,9 @@ agentrial/
 │   ├── statistical.py      # Wilson CI, bootstrap, Fisher, Mann-Whitney, BH
 │   └── trajectory.py       # Failure attribution via divergence analysis
 └── reporters/
-    ├── terminal.py         # Rich terminal output with colored tables
-    └── json_report.py      # JSON export, load, and comparison
+    ├── terminal.py         # Rich terminal output
+    └── json_report.py      # JSON export, load, comparison
 ```
-
----
-
-## Real-World Results
-
-Tested with **Claude 3 Haiku** on a 3-tool agent (calculator, country lookup, temperature conversion) — 100 trials:
-
-| Test Complexity | Pass Rate | 95% CI | Avg Cost | Avg Latency | Avg Tokens |
-|---|---|---|---|---|---|
-| Easy (direct tool call) | 100% | 72.2% - 100% | $0.0005 | 1.6s | 1,513 |
-| Medium (inference + tool) | 100% | 72.2% - 100% | $0.0006 | 2.6s | 1,926 |
-| Hard (multi-step reasoning) | 100% | 72.2% - 100% | $0.0010 | 3.5s | 2,986 |
-
-**100 trials total. $0.06 total cost. Full trajectory capture.**
-
-See the complete example in [`examples/langgraph_haiku/`](examples/langgraph_haiku/).
-
----
-
-## Supported Models
-
-agentrial has built-in pricing data for cost tracking across major providers:
-
-| Provider | Models |
-|---|---|
-| **Anthropic** | Claude 3 Haiku, Sonnet, Opus (all versions), Claude 3.5, Claude 4 |
-| **OpenAI** | GPT-4o, GPT-4o-mini, GPT-4 Turbo, GPT-4, GPT-3.5 Turbo |
-| **Google** | Gemini 1.5 Pro, Gemini 1.5 Flash, Gemini 1.0 Pro |
-| **Mistral** | Large, Medium, Small |
-
-Cost is extracted automatically from model response metadata. No configuration needed.
 
 ---
 
@@ -472,29 +345,33 @@ Cost is extracted automatically from model response metadata. No configuration n
 
 | Framework | Status | Notes |
 |---|---|---|
-| **LangGraph** | Native adapter | Full trajectory capture, callbacks, token tracking |
-| **Any OpenTelemetry-instrumented agent** | Supported | Automatic span capture via OTel SDK |
-| **Custom** | Supported | Implement `AgentInput -> AgentOutput` protocol |
+| **LangGraph** | Native adapter | Full trajectory, callbacks, token tracking |
+| **Any OTel-instrumented agent** | Supported | Automatic span capture via OTel SDK |
+| **Custom** | Supported | `AgentInput -> AgentOutput` protocol |
+
+## Supported Models (cost tracking)
+
+| Provider | Models |
+|---|---|
+| **Anthropic** | Claude 3 Haiku/Sonnet/Opus, Claude 3.5, Claude 4 |
+| **OpenAI** | GPT-4o, GPT-4o-mini, GPT-4 Turbo, GPT-3.5 Turbo |
+| **Google** | Gemini 1.5 Pro/Flash, Gemini 1.0 Pro |
+| **Mistral** | Large, Medium, Small |
 
 ---
 
 ## Contributing
 
 ```bash
-# Clone and install
 git clone https://github.com/alepot55/agentrial.git
 cd agentrial
 pip install -e ".[dev]"
-
-# Run tests
 pytest
-
-# Lint
 ruff check .
-
-# Type check
 mypy agentrial/
 ```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 

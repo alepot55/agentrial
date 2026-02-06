@@ -1,4 +1,4 @@
-"""Metrics computation for AgentEval."""
+"""Metrics computation for Agentrial."""
 
 from agentrial.metrics.basic import compute_basic_metrics
 from agentrial.metrics.statistical import (

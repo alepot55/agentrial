@@ -1,4 +1,4 @@
-"""Trajectory analysis and failure attribution for AgentEval.
+"""Trajectory analysis and failure attribution for Agentrial.
 
 This module implements step-level analysis to identify which trajectory
 steps are most likely responsible for test failures.
