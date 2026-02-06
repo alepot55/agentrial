@@ -699,17 +699,20 @@ def snapshot() -> None:
 
 @snapshot.command("update")
 @click.argument("test_path", type=click.Path(exists=True), required=False)
-@click.option("-n", "--trials", type=int, default=10, help="Number of trials")
+@click.option("-n", "--trials", type=int, default=None, help="Number of trials")
+@click.option(
+    "-c", "--config", "cfg_path", type=click.Path(exists=True), help="Config file path"
+)
 @click.option(
     "-o", "--output", "output_path", type=click.Path(), help="Snapshot output path"
 )
 def snapshot_update(
-    test_path: str | None, trials: int, output_path: str | None
+    test_path: str | None, trials: int | None, cfg_path: str | None,
+    output_path: str | None,
 ) -> None:
     """Run tests and save results as a new snapshot baseline."""
     from agentrial.snapshots import create_snapshot, save_snapshot
 
-    cfg_path = None
     config = load_config(cfg_path)
     effective_trials = trials or config.trials
 
@@ -732,8 +735,13 @@ def snapshot_update(
 
 @snapshot.command("check")
 @click.argument("test_path", type=click.Path(exists=True), required=False)
-@click.option("-n", "--trials", type=int, default=10, help="Number of trials")
-def snapshot_check(test_path: str | None, trials: int) -> None:
+@click.option("-n", "--trials", type=int, default=None, help="Number of trials")
+@click.option(
+    "-c", "--config", "cfg_path", type=click.Path(exists=True), help="Config file path"
+)
+def snapshot_check(
+    test_path: str | None, trials: int | None, cfg_path: str | None
+) -> None:
     """Run tests and compare against existing snapshot."""
     from agentrial.snapshots import (
         compare_with_snapshot,
@@ -742,7 +750,6 @@ def snapshot_check(test_path: str | None, trials: int) -> None:
         print_snapshot_comparison,
     )
 
-    cfg_path = None
     config = load_config(cfg_path)
     effective_trials = trials or config.trials
 
@@ -838,15 +845,23 @@ def security_scan(mcp_config: str, output_path: str | None) -> None:
     required=True,
     help="Comma-separated list of model names",
 )
-@click.option("-n", "--trials", type=int, default=10, help="Trials per model")
+@click.option("-n", "--trials", type=int, default=None, help="Trials per model")
+@click.option(
+    "-c", "--config", "cfg_path", type=click.Path(exists=True), help="Config file path"
+)
 @click.argument("test_path", type=click.Path(exists=True), required=False)
-def pareto_cmd(models: str, trials: int, test_path: str | None) -> None:
+def pareto_cmd(
+    models: str, trials: int | None, cfg_path: str | None, test_path: str | None
+) -> None:
     """Run Pareto frontier analysis across models.
 
     Evaluates the same test suite with different models and identifies
     which models are Pareto-optimal (best cost-accuracy trade-off).
     """
     from agentrial.pareto import analyze_from_results, print_pareto
+
+    config = load_config(cfg_path)
+    effective_trials = trials or config.trials
 
     model_list = [m.strip() for m in models.split(",")]
     test_files = _resolve_test_files(test_path)
@@ -860,7 +875,7 @@ def pareto_cmd(models: str, trials: int, test_path: str | None) -> None:
 
     console.print(
         f"[bold]Pareto analysis:[/bold] {suite.name} with "
-        f"{len(model_list)} models x {trials} trials"
+        f"{len(model_list)} models x {effective_trials} trials"
     )
 
     model_results = {}
@@ -869,14 +884,14 @@ def pareto_cmd(models: str, trials: int, test_path: str | None) -> None:
         # Inject model name into each test case's context
         for case in suite.cases:
             case.input.context["model"] = model_name
-        engine = MultiTrialEngine(trials=trials, show_progress=False)
+        engine = MultiTrialEngine(trials=effective_trials, show_progress=False)
         agent = load_agent(suite.agent)
         result = engine.run_suite(agent, suite)
         model_results[model_name] = {
             "pass_rate": result.overall_pass_rate,
             "mean_cost": result.total_cost / max(len(result.results), 1),
             "mean_latency_ms": result.total_duration_ms / max(len(result.results), 1),
-            "trials": trials,
+            "trials": effective_trials,
         }
 
     pareto_result = analyze_from_results(model_results)

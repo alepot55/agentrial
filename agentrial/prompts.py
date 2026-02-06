@@ -138,8 +138,16 @@ class PromptStore:
         if not path.exists():
             return None
 
-        with open(path) as f:
-            data = json.load(f)
+        try:
+            with open(path) as f:
+                data = json.load(f)
+        except json.JSONDecodeError:
+            import logging
+
+            logging.getLogger(__name__).warning(
+                "Corrupt JSON in prompt version file '%s' — skipping", path
+            )
+            return None
 
         return PromptVersion(**data)
 
@@ -147,14 +155,24 @@ class PromptStore:
         """List all tracked versions in order.
 
         Returns:
-            List of version strings.
+            List of version strings (skips corrupt files).
         """
         if not self.base_dir.exists():
             return []
 
         versions = []
         for path in sorted(self.base_dir.glob("*.json")):
-            versions.append(path.stem)
+            # Verify the file is valid JSON before listing
+            try:
+                with open(path) as f:
+                    json.load(f)
+                versions.append(path.stem)
+            except json.JSONDecodeError:
+                import logging
+
+                logging.getLogger(__name__).warning(
+                    "Corrupt JSON in prompt version file '%s' — skipping", path
+                )
         return versions
 
     def diff(self, version_a: str, version_b: str) -> PromptDiff:

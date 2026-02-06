@@ -31,10 +31,15 @@ class TestWilsonConfidenceInterval:
         assert ci.confidence_level == 0.95
 
     def test_mixed_results(self) -> None:
-        """Test CI with mixed results."""
+        """Test CI with mixed results.
+
+        For p=0.7, n=10 the Wilson 95% CI is approximately [0.397, 0.892].
+        The lower bound must be ABOVE 0.39 (Wald gives ~0.35), proving
+        Wilson's superior boundary behavior.
+        """
         ci = wilson_confidence_interval(7, 10)
-        assert 0.35 < ci.lower < 0.7  # Wilson CI for 70% with n=10
-        assert 0.8 < ci.upper < 1.0
+        assert 0.39 <= ci.lower <= 0.42  # Wilson-specific range
+        assert 0.88 <= ci.upper <= 0.91  # Wilson-specific range
 
     def test_empty_trials(self) -> None:
         """Test CI with no trials."""
@@ -66,12 +71,15 @@ class TestBootstrapConfidenceInterval:
         assert ci.upper == 5.0
 
     def test_varied_values(self) -> None:
-        """Test bootstrap with varied values."""
+        """Test bootstrap with varied values.
+
+        For uniform 1..10 data (mean=5.5), 95% bootstrap CI should be
+        reasonably tight — roughly [3.5, 7.5]. Must NOT accept [0.01, 100].
+        """
         values = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]
         ci = bootstrap_confidence_interval(values, seed=42)
-        assert ci.lower < 5.5
-        assert ci.upper > 5.5
-        assert ci.lower > 0
+        assert 2.5 <= ci.lower <= 5.0  # Reasonably tight lower bound
+        assert 6.0 <= ci.upper <= 8.5  # Reasonably tight upper bound
 
     def test_empty_values(self) -> None:
         """Test bootstrap with empty list."""
@@ -104,9 +112,12 @@ class TestFisherExactTest:
         assert p < 0.01  # Significant difference
 
     def test_returns_odds_ratio(self) -> None:
-        """Test that odds ratio is returned."""
+        """Test that odds ratio is returned.
+
+        For 8/10 vs 2/10 the true odds ratio is (8*8)/(2*2) = 16.0.
+        """
         odds_ratio, _ = fisher_exact_test(8, 10, 2, 10)
-        assert odds_ratio > 1.0  # Group A has higher success rate
+        assert odds_ratio > 5.0  # Must be well above 1 (actual = 16)
 
 
 class TestMannWhitneyU:

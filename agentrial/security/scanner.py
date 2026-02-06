@@ -213,16 +213,55 @@ class MCPSecurityScanner:
         servers = config.get("mcpServers", config.get("servers", {}))
         result.servers_scanned = len(servers)
 
+        if not servers:
+            result.findings.append(
+                SecurityFinding(
+                    severity=Severity.INFO,
+                    category="empty_config",
+                    title="No servers found in config file",
+                    description=(
+                        "The MCP config contains no server definitions. "
+                        "Score is N/A — nothing to scan."
+                    ),
+                    recommendation="Add server definitions to your MCP config.",
+                )
+            )
+            return result
+
         all_tools: list[dict[str, Any]] = []
         tool_server_map: dict[str, str] = {}
 
         for server_name, server_config in servers.items():
+            if not isinstance(server_config, dict):
+                result.findings.append(
+                    SecurityFinding(
+                        severity=Severity.LOW,
+                        category="malformed_config",
+                        title=f"Server '{server_name}' config is not a dict",
+                        description=f"Expected dict, got {type(server_config).__name__}",
+                        server_name=server_name,
+                    )
+                )
+                continue
+
             server_tools = server_config.get("tools", [])
 
             # Check server-level security
             self._check_server_config(server_name, server_config, result)
 
             for tool in server_tools:
+                if not isinstance(tool, dict):
+                    result.findings.append(
+                        SecurityFinding(
+                            severity=Severity.LOW,
+                            category="malformed_config",
+                            title=f"Non-dict tool entry on '{server_name}'",
+                            description=f"Expected dict, got {type(tool).__name__}",
+                            server_name=server_name,
+                        )
+                    )
+                    continue
+
                 tool_name = tool.get("name", "")
                 all_tools.append(tool)
                 tool_server_map[tool_name] = server_name
@@ -450,6 +489,8 @@ class MCPSecurityScanner:
         descriptions against the server's stated purpose.
         """
         for server_name, server_config in servers.items():
+            if not isinstance(server_config, dict):
+                continue
             tools = server_config.get("tools", [])
             server_desc = str(server_config.get("description", "")).lower()
 
@@ -493,6 +534,9 @@ class MCPSecurityScanner:
     ) -> None:
         """Check server-level configuration for security issues."""
         env = config.get("env", {})
+
+        if not isinstance(env, dict):
+            return  # Malformed env — skip silently
 
         # Check for secrets in environment variables
         for key, value in env.items():

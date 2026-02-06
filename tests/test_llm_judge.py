@@ -58,16 +58,17 @@ class TestKrippendorffAlpha:
 
     def test_high_agreement(self) -> None:
         # Raters mostly agree (4, 4, 5 on 1-5 scale)
+        # Expected alpha ≈ 0.958 (Do/De = 0.33/8.0 → 1 - 0.042)
         ratings = [[4.0, 4.0, 5.0]]
         alpha = compute_krippendorff_alpha(ratings)
-        # Disagreement is (1^2)/3 = 0.33, max is 16, so alpha = 1 - 0.33/16 ≈ 0.98
-        assert alpha > 0.9
+        assert alpha > 0.95  # Near-perfect agreement
 
     def test_low_agreement(self) -> None:
         # Raters disagree significantly (1 and 5 on 1-5 scale)
+        # Expected alpha ≈ 0.33 — well below acceptable reliability
         ratings = [[1.0, 5.0, 1.0, 5.0]]
         alpha = compute_krippendorff_alpha(ratings)
-        assert alpha < 0.9
+        assert alpha < 0.4  # Max disagreement on 1-5 scale
 
     def test_single_rating(self) -> None:
         # Single rating => trivially perfect
@@ -81,12 +82,13 @@ class TestKrippendorffAlpha:
 
     def test_multiple_items(self) -> None:
         # Two items, each with 3 ratings
+        # Expected alpha ≈ 0.545 — moderate agreement
         ratings = [
             [4.0, 4.0, 5.0],  # High agreement
             [2.0, 3.0, 2.0],  # Moderate agreement
         ]
         alpha = compute_krippendorff_alpha(ratings)
-        assert -1.0 <= alpha <= 1.0
+        assert 0.4 < alpha < 0.7  # Moderate, not perfect
 
 
 class TestLLMJudge:
