@@ -55,6 +55,14 @@ baseline.json
 results.json
 *.jsonl
 
+# VS Code extension build artifacts
+vscode-extension/node_modules/
+vscode-extension/out/
+*.vsix
+
+# Benchmark terminal logs
+examples/benchmark/terminal_output_*.txt
+
 # Claude Code
 .claude/
 CLAUDE.md
