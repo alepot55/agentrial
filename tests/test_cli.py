@@ -3,10 +3,7 @@
 import json
 import os
 import subprocess
-import sys
 import tempfile
-
-import pytest
 
 AGENTRIAL = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".venv", "bin", "agentrial")
 

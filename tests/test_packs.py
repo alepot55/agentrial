@@ -2,11 +2,11 @@
 
 from agentrial.packs import (
     PackInfo,
+    _runtime_packs,
     discover_packs,
     list_runtime_packs,
     load_runtime_pack,
     register_pack,
-    _runtime_packs,
 )
 from agentrial.types import AgentInput, Suite, TestCase
 

@@ -7,12 +7,12 @@ from agentrial.types import (
     AgentOutput,
     ConfidenceInterval,
     EvalResult,
+    StepType,
     Suite,
     SuiteResult,
     TestCase,
     TrajectoryStep,
     TrialResult,
-    StepType,
 )
 
 
