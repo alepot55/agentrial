@@ -1,0 +1,5935 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-02-06T17:12:08.247193Z",
+  "suite": {
+    "name": "real-agent-benchmark",
+    "agent": "examples.benchmark.agent.agent",
+    "trials": 50,
+    "threshold": 0.8
+  },
+  "summary": {
+    "passed": true,
+    "overall_pass_rate": 0.9428571428571428,
+    "overall_pass_rate_ci": {
+      "lower": 0.8912967078209393,
+      "upper": 0.9707635147090092,
+      "confidence_level": 0.95
+    },
+    "total_cost": 0.1138965,
+    "total_duration_ms": 876209.2196941376
+  },
+  "results": [
+    {
+      "test_case": {
+        "name": "simple-math",
+        "tags": []
+      },
+      "pass_rate": 0.7,
+      "pass_rate_ci": {
+        "lower": 0.4810271816464765,
+        "upper": 0.8545227551323956
+      },
+      "mean_cost": 0.0005330625,
+      "cost_ci": {
+        "lower": 0.0005314059375,
+        "upper": 0.000535163125
+      },
+      "mean_latency_ms": 4733.939599990845,
+      "latency_ci": {
+        "lower": 1790.1772025227547,
+        "upper": 10393.260777294636
+      },
+      "mean_tokens": 1789.85,
+      "trials": [
+        {
+          "trial_index": 0,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1682.706594467163,
+          "cost": 0.00052775,
+          "tokens": 1783,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 908.7855815887451,
+              "tokens": 876
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03337860107421875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 541.3205623626709,
+              "tokens": 907
+            }
+          ]
+        },
+        {
+          "trial_index": 1,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1506.8433284759521,
+          "cost": 0.000532,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 949.7036933898926,
+              "tokens": 878
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06103515625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 542.9155826568604,
+              "tokens": 910
+            }
+          ]
+        },
+        {
+          "trial_index": 2,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1991.483449935913,
+          "cost": 0.0005337499999999999,
+          "tokens": 1791,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1066.1790370941162,
+              "tokens": 880
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03170967102050781,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 898.2024192810059,
+              "tokens": 911
+            }
+          ]
+        },
+        {
+          "trial_index": 3,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1961.4901542663574,
+          "cost": 0.00052775,
+          "tokens": 1783,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 854.5753955841064,
+              "tokens": 876
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.08153915405273438,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1083.8985443115234,
+              "tokens": 907
+            }
+          ]
+        },
+        {
+          "trial_index": 4,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2306.82373046875,
+          "cost": 0.0005337499999999999,
+          "tokens": 1791,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1598.2136726379395,
+              "tokens": 880
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.09250640869140625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 683.5174560546875,
+              "tokens": 911
+            }
+          ]
+        },
+        {
+          "trial_index": 5,
+          "passed": false,
+          "failures": [
+            "Missing expected substrings: ['4446']"
+          ],
+          "duration_ms": 1691.4889812469482,
+          "cost": 0.000532,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1031.9409370422363,
+              "tokens": 878
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.026702880859375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 644.3943977355957,
+              "tokens": 910
+            }
+          ]
+        },
+        {
+          "trial_index": 6,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1562.94584274292,
+          "cost": 0.00053075,
+          "tokens": 1787,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 935.070276260376,
+              "tokens": 878
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.026941299438476562,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 602.7336120605469,
+              "tokens": 909
+            }
+          ]
+        },
+        {
+          "trial_index": 7,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2123.922824859619,
+          "cost": 0.0005337499999999999,
+          "tokens": 1791,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1041.8000221252441,
+              "tokens": 880
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03933906555175781,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1069.2534446716309,
+              "tokens": 911
+            }
+          ]
+        },
+        {
+          "trial_index": 8,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1487.309455871582,
+          "cost": 0.0005415,
+          "tokens": 1802,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 889.6989822387695,
+              "tokens": 886
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.04029273986816406,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 579.3232917785645,
+              "tokens": 916
+            }
+          ]
+        },
+        {
+          "trial_index": 9,
+          "passed": false,
+          "failures": [
+            "Missing expected substrings: ['4446']"
+          ],
+          "duration_ms": 1555.1953315734863,
+          "cost": 0.000535,
+          "tokens": 1792,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 937.9475116729736,
+              "tokens": 880
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.10704994201660156,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 601.2821197509766,
+              "tokens": 912
+            }
+          ]
+        },
+        {
+          "trial_index": 10,
+          "passed": false,
+          "failures": [
+            "Missing expected substrings: ['4446']"
+          ],
+          "duration_ms": 1525.6407260894775,
+          "cost": 0.00052775,
+          "tokens": 1783,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 990.4825687408447,
+              "tokens": 876
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06103515625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 505.08594512939453,
+              "tokens": 907
+            }
+          ]
+        },
+        {
+          "trial_index": 11,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1730.0777435302734,
+          "cost": 0.00053675,
+          "tokens": 1795,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1043.1370735168457,
+              "tokens": 882
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.04839897155761719,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 659.0642929077148,
+              "tokens": 913
+            }
+          ]
+        },
+        {
+          "trial_index": 12,
+          "passed": false,
+          "failures": [
+            "Missing expected substrings: ['4446']"
+          ],
+          "duration_ms": 1798.6128330230713,
+          "cost": 0.0005332500000000001,
+          "tokens": 1789,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1175.1153469085693,
+              "tokens": 878
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.09584426879882812,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 609.3943119049072,
+              "tokens": 911
+            }
+          ]
+        },
+        {
+          "trial_index": 13,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2925.1885414123535,
+          "cost": 0.0005337499999999999,
+          "tokens": 1791,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1748.3839988708496,
+              "tokens": 880
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.029325485229492188,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1159.7933769226074,
+              "tokens": 911
+            }
+          ]
+        },
+        {
+          "trial_index": 14,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1841.8047428131104,
+          "cost": 0.00053075,
+          "tokens": 1787,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 999.9654293060303,
+              "tokens": 878
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.04220008850097656,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 828.3987045288086,
+              "tokens": 909
+            }
+          ]
+        },
+        {
+          "trial_index": 15,
+          "passed": false,
+          "failures": [
+            "Missing expected substrings: ['4446']"
+          ],
+          "duration_ms": 2312.675952911377,
+          "cost": 0.00053025,
+          "tokens": 1785,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1208.380937576294,
+              "tokens": 876
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.035762786865234375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1091.320276260376,
+              "tokens": 909
+            }
+          ]
+        },
+        {
+          "trial_index": 16,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2342.4699306488037,
+          "cost": 0.00053825,
+          "tokens": 1797,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1685.4588985443115,
+              "tokens": 883
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.026702880859375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 637.578010559082,
+              "tokens": 914
+            }
+          ]
+        },
+        {
+          "trial_index": 17,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1600.7585525512695,
+          "cost": 0.00052775,
+          "tokens": 1783,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1007.5409412384033,
+              "tokens": 876
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.09632110595703125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 576.2224197387695,
+              "tokens": 907
+            }
+          ]
+        },
+        {
+          "trial_index": 18,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 58039.12615776062,
+          "cost": 0.000544,
+          "tokens": 1804,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 56883.26954841614,
+              "tokens": 886
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.029087066650390625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1134.6189975738525,
+              "tokens": 918
+            }
+          ]
+        },
+        {
+          "trial_index": 19,
+          "passed": false,
+          "failures": [
+            "Missing expected substrings: ['4446']"
+          ],
+          "duration_ms": 2692.2271251678467,
+          "cost": 0.00053075,
+          "tokens": 1787,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1052.536964416504,
+              "tokens": 878
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.07534027099609375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1612.3909950256348,
+              "tokens": 909
+            }
+          ]
+        }
+      ],
+      "failure_attribution": {
+        "most_likely_step": null,
+        "step_divergences": [
+          {
+            "step_index": 0,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 14
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 6
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 1,
+            "p_value": 1.0,
+            "successful_actions": {
+              "tool_call:calculator": 14
+            },
+            "failed_actions": {
+              "tool_call:calculator": 6
+            },
+            "most_common_success": "tool_call:calculator",
+            "most_common_fail": "tool_call:calculator",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 2,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 14
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 6
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          }
+        ],
+        "failure_patterns": [
+          {
+            "message": "Missing expected substrings: ['4446']",
+            "count": 6,
+            "percentage": 100.0
+          }
+        ],
+        "recommendation": "No single step shows significant divergence after Benjamini-Hochberg correction. Failures may be due to cumulative errors or random variation."
+      }
+    },
+    {
+      "test_case": {
+        "name": "capital-lookup",
+        "tags": []
+      },
+      "pass_rate": 1.0,
+      "pass_rate_ci": {
+        "lower": 0.8388748419471806,
+        "upper": 1.0
+      },
+      "mean_cost": 0.000513125,
+      "cost_ci": {
+        "lower": 0.0005129999999999999,
+        "upper": 0.0005133124999999999
+      },
+      "mean_latency_ms": 3113.6518716812134,
+      "latency_ci": {
+        "lower": 1507.5625413656235,
+        "upper": 6233.451279997826
+      },
+      "mean_tokens": 1788.1,
+      "trials": [
+        {
+          "trial_index": 0,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1252.2659301757812,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 780.3399562835693,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.012636184692382812,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 456.4507007598877,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 1,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1391.2162780761719,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 874.5579719543457,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0057220458984375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 500.9186267852783,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 2,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2182.6171875,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 916.1956310272217,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.00286102294921875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1252.223253250122,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 3,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1534.7306728363037,
+          "cost": 0.00051425,
+          "tokens": 1789,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 799.4375228881836,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.002384185791015625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 721.9374179840088,
+              "tokens": 924
+            }
+          ]
+        },
+        {
+          "trial_index": 4,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1473.2391834259033,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 934.6432685852051,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0059604644775390625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 512.1424198150635,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 5,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1647.1283435821533,
+          "cost": 0.00051425,
+          "tokens": 1789,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1016.6079998016357,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0054836273193359375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 611.0494136810303,
+              "tokens": 924
+            }
+          ]
+        },
+        {
+          "trial_index": 6,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1334.989309310913,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 842.5571918487549,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.00286102294921875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 468.34611892700195,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 7,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1497.685194015503,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 999.427080154419,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0057220458984375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 484.8649501800537,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 8,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1621.1950778961182,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1038.0184650421143,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0030994415283203125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 554.1760921478271,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 9,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1432.8172206878662,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 921.7455387115479,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0095367431640625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 490.91196060180664,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 10,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1881.0081481933594,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1219.299554824829,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.00762939453125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 641.4356231689453,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 11,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1692.3635005950928,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1040.1098728179932,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.003337860107421875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 627.479076385498,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 12,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1352.8778553009033,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 800.4500865936279,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0059604644775390625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 538.3317470550537,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 13,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1575.8476257324219,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 965.2934074401855,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.00286102294921875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 586.4923000335693,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 14,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1449.6140480041504,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 811.9196891784668,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.009775161743164062,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 623.9490509033203,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 15,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1345.015287399292,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 811.8233680725098,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0064373016357421875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 512.6438140869141,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 16,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 32282.52673149109,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 31711.11536026001,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0045299530029296875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 556.8790435791016,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 17,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1942.1114921569824,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 790.6525135040283,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0040531158447265625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1133.685827255249,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 18,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1737.6234531402588,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1174.0214824676514,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.011205673217773438,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 542.1850681304932,
+              "tokens": 923
+            }
+          ]
+        },
+        {
+          "trial_index": 19,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1646.164894104004,
+          "cost": 0.000513,
+          "tokens": 1788,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 895.7788944244385,
+              "tokens": 865
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.00476837158203125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 736.7362976074219,
+              "tokens": 923
+            }
+          ]
+        }
+      ],
+      "failure_attribution": null
+    },
+    {
+      "test_case": {
+        "name": "multi-step-calculation",
+        "tags": []
+      },
+      "pass_rate": 0.95,
+      "pass_rate_ci": {
+        "lower": 0.763868806553258,
+        "upper": 0.9911185511992047
+      },
+      "mean_cost": 0.001310425,
+      "cost_ci": {
+        "lower": 0.0011999134375,
+        "upper": 0.0013546996875
+      },
+      "mean_latency_ms": 9617.604517936707,
+      "latency_ci": {
+        "lower": 4551.860716342926,
+        "upper": 15368.742394447327
+      },
+      "mean_tokens": 4106.3,
+      "trials": [
+        {
+          "trial_index": 0,
+          "passed": false,
+          "failures": [
+            "Output must contain at least one of: ['382.46', '382.4625', '382.47']"
+          ],
+          "duration_ms": 4788.116455078125,
+          "cost": 0.00134475,
+          "tokens": 4219,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1089.336633682251,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.044345855712890625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1265.9292221069336,
+              "tokens": 1019
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.08273124694824219,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1118.8685894012451,
+              "tokens": 1122
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.031948089599609375,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1300.4436492919922,
+              "tokens": 1171
+            }
+          ]
+        },
+        {
+          "trial_index": 1,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4506.277799606323,
+          "cost": 0.0013535,
+          "tokens": 4230,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 917.151927947998,
+              "tokens": 906
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.07557868957519531,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1146.2631225585938,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.11992454528808594,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1156.2116146087646,
+              "tokens": 1128
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.11754035949707031,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1272.890567779541,
+              "tokens": 1178
+            }
+          ]
+        },
+        {
+          "trial_index": 2,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4845.531225204468,
+          "cost": 0.00135575,
+          "tokens": 4235,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1447.7767944335938,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.042438507080078125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1159.3914031982422,
+              "tokens": 1020
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.1010894775390625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1311.4197254180908,
+              "tokens": 1129
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06842613220214844,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 905.5759906768799,
+              "tokens": 1179
+            }
+          ]
+        },
+        {
+          "trial_index": 3,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 43195.905685424805,
+          "cost": 0.0013354999999999999,
+          "tokens": 4214,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1047.422170639038,
+              "tokens": 906
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0591278076171875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 40365.43583869934,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.10633468627929688,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1054.7397136688232,
+              "tokens": 1126
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03266334533691406,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 706.8402767181396,
+              "tokens": 1164
+            }
+          ]
+        },
+        {
+          "trial_index": 4,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4491.117477416992,
+          "cost": 0.00137375,
+          "tokens": 4259,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1567.8575038909912,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.04458427429199219,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1090.2338027954102,
+              "tokens": 1020
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.10728836059570312,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1136.646032333374,
+              "tokens": 1141
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03218650817871094,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 682.9125881195068,
+              "tokens": 1191
+            }
+          ]
+        },
+        {
+          "trial_index": 5,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4019.5138454437256,
+          "cost": 0.00134775,
+          "tokens": 4223,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1027.986764907837,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06341934204101562,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1232.774257659912,
+              "tokens": 1019
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.05316734313964844,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1070.2204704284668,
+              "tokens": 1124
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.05221366882324219,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 656.0482978820801,
+              "tokens": 1173
+            }
+          ]
+        },
+        {
+          "trial_index": 6,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4420.795917510986,
+          "cost": 0.00136525,
+          "tokens": 4249,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1007.2059631347656,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.030040740966796875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1241.194486618042,
+              "tokens": 1022
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.034332275390625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1076.493263244629,
+              "tokens": 1135
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03266334533691406,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1078.791856765747,
+              "tokens": 1185
+            }
+          ]
+        },
+        {
+          "trial_index": 7,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3707.740545272827,
+          "cost": 0.00130875,
+          "tokens": 4159,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 986.0837459564209,
+              "tokens": 906
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.07581710815429688,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 983.3106994628906,
+              "tokens": 1002
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.05054473876953125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1033.9293479919434,
+              "tokens": 1101
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0457763671875,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 683.967113494873,
+              "tokens": 1150
+            }
+          ]
+        },
+        {
+          "trial_index": 8,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2308.73703956604,
+          "cost": 0.0005809999999999999,
+          "tokens": 1876,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1417.5779819488525,
+              "tokens": 914
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.034332275390625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 863.3594512939453,
+              "tokens": 962
+            }
+          ]
+        },
+        {
+          "trial_index": 9,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 6357.712507247925,
+          "cost": 0.0013455000000000001,
+          "tokens": 4230,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 955.9862613677979,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.029802322387695312,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1694.035291671753,
+              "tokens": 1021
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0705718994140625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 3109.9541187286377,
+              "tokens": 1132
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06699562072753906,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 575.1237869262695,
+              "tokens": 1170
+            }
+          ]
+        },
+        {
+          "trial_index": 10,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4714.4834995269775,
+          "cost": 0.0013750000000000001,
+          "tokens": 4260,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1468.5182571411133,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0782012939453125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1227.1251678466797,
+              "tokens": 1019
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.05125999450683594,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1192.4877166748047,
+              "tokens": 1142
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06365776062011719,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 812.0543956756592,
+              "tokens": 1192
+            }
+          ]
+        },
+        {
+          "trial_index": 11,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 30908.283233642578,
+          "cost": 0.00133525,
+          "tokens": 4197,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 27344.881772994995,
+              "tokens": 906
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.1201629638671875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1000.481128692627,
+              "tokens": 1005
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.064849853515625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1880.575180053711,
+              "tokens": 1118
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03266334533691406,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 665.3697490692139,
+              "tokens": 1168
+            }
+          ]
+        },
+        {
+          "trial_index": 12,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 5354.077100753784,
+          "cost": 0.0013599999999999999,
+          "tokens": 4240,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1077.8796672821045,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.030517578125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1681.25319480896,
+              "tokens": 1019
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.07343292236328125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1863.257646560669,
+              "tokens": 1132
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03504753112792969,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 718.3003425598145,
+              "tokens": 1182
+            }
+          ]
+        },
+        {
+          "trial_index": 13,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4691.816568374634,
+          "cost": 0.001353,
+          "tokens": 4232,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1399.2853164672852,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.08130073547363281,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1233.3157062530518,
+              "tokens": 1022
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.10943412780761719,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1157.9923629760742,
+              "tokens": 1127
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.08559226989746094,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 887.9799842834473,
+              "tokens": 1176
+            }
+          ]
+        },
+        {
+          "trial_index": 14,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4672.312259674072,
+          "cost": 0.0013357500000000001,
+          "tokens": 4215,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1165.5454635620117,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.04601478576660156,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1047.9576587677002,
+              "tokens": 1020
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06556510925292969,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1834.8703384399414,
+              "tokens": 1125
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.058650970458984375,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 598.120927810669,
+              "tokens": 1163
+            }
+          ]
+        },
+        {
+          "trial_index": 15,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 42167.68670082092,
+          "cost": 0.0013235,
+          "tokens": 4178,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 39209.96856689453,
+              "tokens": 906
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.12063980102539062,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1078.3586502075195,
+              "tokens": 1000
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.040531158447265625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1163.1548404693604,
+              "tokens": 1111
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.07009506225585938,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 702.6405334472656,
+              "tokens": 1161
+            }
+          ]
+        },
+        {
+          "trial_index": 16,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4412.961721420288,
+          "cost": 0.0013682500000000001,
+          "tokens": 4249,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1129.6765804290771,
+              "tokens": 906
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03218650817871094,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1113.1250858306885,
+              "tokens": 1017
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03170967102050781,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1161.958932876587,
+              "tokens": 1138
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06580352783203125,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 991.1601543426514,
+              "tokens": 1188
+            }
+          ]
+        },
+        {
+          "trial_index": 17,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4134.278059005737,
+          "cost": 0.0013582499999999999,
+          "tokens": 4233,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 938.1492137908936,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03838539123535156,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1120.039463043213,
+              "tokens": 1012
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06699562072753906,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1364.8896217346191,
+              "tokens": 1132
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.1266002655029297,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 696.9552040100098,
+              "tokens": 1182
+            }
+          ]
+        },
+        {
+          "trial_index": 18,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4216.888189315796,
+          "cost": 0.00133525,
+          "tokens": 4197,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1064.476490020752,
+              "tokens": 906
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03361701965332031,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1039.1273498535156,
+              "tokens": 1005
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.10728836059570312,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1082.7271938323975,
+              "tokens": 1118
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.09965896606445312,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1015.2738094329834,
+              "tokens": 1168
+            }
+          ]
+        },
+        {
+          "trial_index": 19,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4437.854528427124,
+          "cost": 0.0013527500000000002,
+          "tokens": 4231,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1193.256139755249,
+              "tokens": 907
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06699562072753906,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1281.1901569366455,
+              "tokens": 1021
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0324249267578125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1247.807502746582,
+              "tokens": 1127
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.08177757263183594,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 693.8159465789795,
+              "tokens": 1176
+            }
+          ]
+        }
+      ],
+      "failure_attribution": {
+        "most_likely_step": null,
+        "step_divergences": [
+          {
+            "step_index": 0,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 19
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 1,
+            "p_value": 1.0,
+            "successful_actions": {
+              "tool_call:calculator": 19
+            },
+            "failed_actions": {
+              "tool_call:calculator": 1
+            },
+            "most_common_success": "tool_call:calculator",
+            "most_common_fail": "tool_call:calculator",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 2,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 19
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 3,
+            "p_value": 1.0,
+            "successful_actions": {
+              "tool_call:calculator": 18
+            },
+            "failed_actions": {
+              "tool_call:calculator": 1
+            },
+            "most_common_success": "tool_call:calculator",
+            "most_common_fail": "tool_call:calculator",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 4,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 18
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 5,
+            "p_value": 1.0,
+            "successful_actions": {
+              "tool_call:calculator": 18
+            },
+            "failed_actions": {
+              "tool_call:calculator": 1
+            },
+            "most_common_success": "tool_call:calculator",
+            "most_common_fail": "tool_call:calculator",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 6,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 18
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          }
+        ],
+        "failure_patterns": [
+          {
+            "message": "Output must contain at least one of: ['382.46', '382.4625', '382.47']",
+            "count": 1,
+            "percentage": 100.0
+          }
+        ],
+        "recommendation": "No single step shows significant divergence after Benjamini-Hochberg correction. Failures may be due to cumulative errors or random variation."
+      }
+    },
+    {
+      "test_case": {
+        "name": "unit-conversion",
+        "tags": []
+      },
+      "pass_rate": 1.0,
+      "pass_rate_ci": {
+        "lower": 0.8388748419471806,
+        "upper": 1.0
+      },
+      "mean_cost": 0.001097025,
+      "cost_ci": {
+        "lower": 0.0010285559375,
+        "upper": 0.001189333125
+      },
+      "mean_latency_ms": 8846.91927433014,
+      "latency_ci": {
+        "lower": 4315.2859154343605,
+        "upper": 14438.84240746498
+      },
+      "mean_tokens": 3238.3,
+      "trials": [
+        {
+          "trial_index": 0,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3045.6838607788086,
+          "cost": 0.001046,
+          "tokens": 3144,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1110.313892364502,
+              "tokens": 936
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.030517578125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1060.3086948394775,
+              "tokens": 1056
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.003337860107421875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 861.2356185913086,
+              "tokens": 1152
+            }
+          ]
+        },
+        {
+          "trial_index": 1,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 40537.05859184265,
+          "cost": 0.0010609999999999999,
+          "tokens": 3164,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1277.0764827728271,
+              "tokens": 941
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.03170967102050781,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1109.2042922973633,
+              "tokens": 1061
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.007867813110351562,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 38138.01884651184,
+              "tokens": 1162
+            }
+          ]
+        },
+        {
+          "trial_index": 2,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4096.392869949341,
+          "cost": 0.00105075,
+          "tokens": 3147,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 2048.365354537964,
+              "tokens": 936
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.027418136596679688,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1110.234260559082,
+              "tokens": 1055
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0040531158447265625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 924.9224662780762,
+              "tokens": 1156
+            }
+          ]
+        },
+        {
+          "trial_index": 3,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4103.649854660034,
+          "cost": 0.0010609999999999999,
+          "tokens": 3156,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1462.599277496338,
+              "tokens": 936
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.018835067749023438,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1306.0758113861084,
+              "tokens": 1056
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.010728836059570312,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1296.217679977417,
+              "tokens": 1164
+            }
+          ]
+        },
+        {
+          "trial_index": 4,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 5354.004144668579,
+          "cost": 0.001558,
+          "tokens": 4520,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1576.0884284973145,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.0152587890625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1094.0613746643066,
+              "tokens": 1059
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.008106231689453125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1258.3363056182861,
+              "tokens": 1191
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.013589859008789062,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1409.9383354187012,
+              "tokens": 1333
+            }
+          ]
+        },
+        {
+          "trial_index": 5,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4096.266508102417,
+          "cost": 0.001049,
+          "tokens": 3144,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1833.5070610046387,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.013828277587890625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1383.1186294555664,
+              "tokens": 1052
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0133514404296875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 866.0886287689209,
+              "tokens": 1155
+            }
+          ]
+        },
+        {
+          "trial_index": 6,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4998.597860336304,
+          "cost": 0.0015955000000000001,
+          "tokens": 4550,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1099.9996662139893,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.04410743713378906,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1144.8354721069336,
+              "tokens": 1058
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0040531158447265625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1269.8659896850586,
+              "tokens": 1192
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.034332275390625,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1468.306541442871,
+              "tokens": 1363
+            }
+          ]
+        },
+        {
+          "trial_index": 7,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3774.4877338409424,
+          "cost": 0.00106625,
+          "tokens": 3157,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1305.0999641418457,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.015974044799804688,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1180.7703971862793,
+              "tokens": 1051
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0035762786865234375,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1275.4790782928467,
+              "tokens": 1169
+            }
+          ]
+        },
+        {
+          "trial_index": 8,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 31985.713005065918,
+          "cost": 0.001087,
+          "tokens": 3176,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1504.5013427734375,
+              "tokens": 936
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.0152587890625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1106.553077697754,
+              "tokens": 1055
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.003337860107421875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 29359.995126724243,
+              "tokens": 1185
+            }
+          ]
+        },
+        {
+          "trial_index": 9,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4430.265665054321,
+          "cost": 0.00106975,
+          "tokens": 3171,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 2331.3255310058594,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.015020370483398438,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1203.2864093780518,
+              "tokens": 1065
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0045299530029296875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 881.4306259155273,
+              "tokens": 1169
+            }
+          ]
+        },
+        {
+          "trial_index": 10,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3327.626943588257,
+          "cost": 0.00103675,
+          "tokens": 3139,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1393.1145668029785,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.04982948303222656,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1140.265703201294,
+              "tokens": 1058
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.00762939453125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 778.6760330200195,
+              "tokens": 1144
+            }
+          ]
+        },
+        {
+          "trial_index": 11,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 5332.603216171265,
+          "cost": 0.00111125,
+          "tokens": 3197,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1206.7294120788574,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.05698204040527344,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1729.3829917907715,
+              "tokens": 1056
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.014543533325195312,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 2380.544662475586,
+              "tokens": 1204
+            }
+          ]
+        },
+        {
+          "trial_index": 12,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4630.207300186157,
+          "cost": 0.0010757499999999999,
+          "tokens": 3163,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1188.3606910705566,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.0324249267578125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 2488.361358642578,
+              "tokens": 1058
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.013828277587890625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 932.1320056915283,
+              "tokens": 1168
+            }
+          ]
+        },
+        {
+          "trial_index": 13,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3739.6037578582764,
+          "cost": 0.00107525,
+          "tokens": 3169,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1295.5589294433594,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.019550323486328125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1104.3388843536377,
+              "tokens": 1057
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.009298324584960938,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1315.199851989746,
+              "tokens": 1175
+            }
+          ]
+        },
+        {
+          "trial_index": 14,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4971.223592758179,
+          "cost": 0.0010315,
+          "tokens": 3134,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1618.2043552398682,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.01430511474609375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 2498.8434314727783,
+              "tokens": 1057
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.008344650268554688,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 832.2088718414307,
+              "tokens": 1140
+            }
+          ]
+        },
+        {
+          "trial_index": 15,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 32948.93145561218,
+          "cost": 0.0006785000000000001,
+          "tokens": 1982,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 31731.285333633423,
+              "tokens": 946
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.03719329833984375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1202.775239944458,
+              "tokens": 1036
+            }
+          ]
+        },
+        {
+          "trial_index": 16,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4803.651809692383,
+          "cost": 0.00105375,
+          "tokens": 3151,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1211.1873626708984,
+              "tokens": 936
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.03361701965332031,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 2486.5212440490723,
+              "tokens": 1057
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0035762786865234375,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1091.28999710083,
+              "tokens": 1158
+            }
+          ]
+        },
+        {
+          "trial_index": 17,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3536.3998413085938,
+          "cost": 0.0010722499999999999,
+          "tokens": 3157,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1377.4824142456055,
+              "tokens": 936
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.026464462280273438,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1078.5880088806152,
+              "tokens": 1055
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.003814697265625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1067.0063495635986,
+              "tokens": 1166
+            }
+          ]
+        },
+        {
+          "trial_index": 18,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3644.443988800049,
+          "cost": 0.001086,
+          "tokens": 3176,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1237.1432781219482,
+              "tokens": 940
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.017404556274414062,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1177.87504196167,
+              "tokens": 1061
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.00762939453125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1210.5863094329834,
+              "tokens": 1175
+            }
+          ]
+        },
+        {
+          "trial_index": 19,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3581.573486328125,
+          "cost": 0.00107525,
+          "tokens": 3169,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1228.8122177124023,
+              "tokens": 937
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.051021575927734375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1258.8891983032227,
+              "tokens": 1057
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "search_knowledge",
+              "duration_ms": 0.0133514404296875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1080.1825523376465,
+              "tokens": 1175
+            }
+          ]
+        }
+      ],
+      "failure_attribution": null
+    },
+    {
+      "test_case": {
+        "name": "compound-reasoning",
+        "tags": []
+      },
+      "pass_rate": 0.95,
+      "pass_rate_ci": {
+        "lower": 0.763868806553258,
+        "upper": 0.9911185511992047
+      },
+      "mean_cost": 0.0011195250000000001,
+      "cost_ci": {
+        "lower": 0.0009365296874999999,
+        "upper": 0.001300864375
+      },
+      "mean_latency_ms": 6681.062579154968,
+      "latency_ci": {
+        "lower": 3395.1669773459435,
+        "upper": 12983.579516112803
+      },
+      "mean_tokens": 3339.5,
+      "trials": [
+        {
+          "trial_index": 0,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2746.2055683135986,
+          "cost": 0.0004595,
+          "tokens": 1050,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 2733.205556869507,
+              "tokens": 1050
+            }
+          ]
+        },
+        {
+          "trial_index": 1,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3460.355520248413,
+          "cost": 0.00109775,
+          "tokens": 3235,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1089.7114276885986,
+              "tokens": 928
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03266334533691406,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1646.0456848144531,
+              "tokens": 1127
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.02384185791015625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 702.0456790924072,
+              "tokens": 1180
+            }
+          ]
+        },
+        {
+          "trial_index": 2,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3718.3303833007812,
+          "cost": 0.0010544999999999999,
+          "tokens": 3206,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1367.997646331787,
+              "tokens": 978
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03910064697265625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1265.0489807128906,
+              "tokens": 1094
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06413459777832031,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1068.8347816467285,
+              "tokens": 1134
+            }
+          ]
+        },
+        {
+          "trial_index": 3,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3762.3870372772217,
+          "cost": 0.001176,
+          "tokens": 3324,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1072.3612308502197,
+              "tokens": 928
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03337860107421875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1681.0078620910645,
+              "tokens": 1123
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.025987625122070312,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 994.1225051879883,
+              "tokens": 1273
+            }
+          ]
+        },
+        {
+          "trial_index": 4,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4685.147047042847,
+          "cost": 0.00154225,
+          "tokens": 4633,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1426.447868347168,
+              "tokens": 1000
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0324249267578125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1281.2812328338623,
+              "tokens": 1104
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.02956390380859375,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1282.423496246338,
+              "tokens": 1240
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.0457763671875,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 677.5786876678467,
+              "tokens": 1289
+            }
+          ]
+        },
+        {
+          "trial_index": 5,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3556.0810565948486,
+          "cost": 0.0010775,
+          "tokens": 3270,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1502.4240016937256,
+              "tokens": 1005
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.030040740966796875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 988.2040023803711,
+              "tokens": 1110
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03528594970703125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1034.2049598693848,
+              "tokens": 1155
+            }
+          ]
+        },
+        {
+          "trial_index": 6,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2277.5604724884033,
+          "cost": 0.00067,
+          "tokens": 2024,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1442.9104328155518,
+              "tokens": 993
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06079673767089844,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 810.5623722076416,
+              "tokens": 1031
+            }
+          ]
+        },
+        {
+          "trial_index": 7,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2509.584903717041,
+          "cost": 0.000673,
+          "tokens": 2028,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1575.7956504821777,
+              "tokens": 995
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.1239776611328125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 910.5968475341797,
+              "tokens": 1033
+            }
+          ]
+        },
+        {
+          "trial_index": 8,
+          "passed": false,
+          "failures": [
+            "Output must contain at least one of: ['546', '547', '546.875', '546.88']"
+          ],
+          "duration_ms": 5663.5637283325195,
+          "cost": 0.00194725,
+          "tokens": 6037,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1098.1802940368652,
+              "tokens": 926
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.062465667724609375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1425.0953197479248,
+              "tokens": 1073
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.010967254638671875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1338.3867740631104,
+              "tokens": 1267
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.03600120544433594,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1001.9710063934326,
+              "tokens": 1364
+            },
+            {
+              "step_index": 7,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03933906555175781,
+              "tokens": 0
+            },
+            {
+              "step_index": 8,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 777.1663665771484,
+              "tokens": 1407
+            }
+          ]
+        },
+        {
+          "trial_index": 9,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 16287.506341934204,
+          "cost": 0.0019725,
+          "tokens": 6082,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 12152.648448944092,
+              "tokens": 989
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03266334533691406,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1185.5909824371338,
+              "tokens": 1092
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.034332275390625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1345.5228805541992,
+              "tokens": 1224
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.022649765014648438,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 945.2414512634277,
+              "tokens": 1369
+            },
+            {
+              "step_index": 7,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.045299530029296875,
+              "tokens": 0
+            },
+            {
+              "step_index": 8,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 643.0621147155762,
+              "tokens": 1408
+            }
+          ]
+        },
+        {
+          "trial_index": 10,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2180.0055503845215,
+          "cost": 0.00067225,
+          "tokens": 2025,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1390.9032344818115,
+              "tokens": 992
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.12278556823730469,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 764.4574642181396,
+              "tokens": 1033
+            }
+          ]
+        },
+        {
+          "trial_index": 11,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 53553.58934402466,
+          "cost": 0.0011255,
+          "tokens": 3338,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1573.6823081970215,
+              "tokens": 1033
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06413459777832031,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 51312.58726119995,
+              "tokens": 1133
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.08559226989746094,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 636.4812850952148,
+              "tokens": 1172
+            }
+          ]
+        },
+        {
+          "trial_index": 12,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3435.0979328155518,
+          "cost": 0.001079,
+          "tokens": 3260,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1678.621530532837,
+              "tokens": 1011
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.034809112548828125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1149.8043537139893,
+              "tokens": 1104
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.10728836059570312,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 593.0972099304199,
+              "tokens": 1145
+            }
+          ]
+        },
+        {
+          "trial_index": 13,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3354.300022125244,
+          "cost": 0.00110975,
+          "tokens": 3311,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1687.1018409729004,
+              "tokens": 1023
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.04076957702636719,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 982.1529388427734,
+              "tokens": 1125
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03147125244140625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 669.4679260253906,
+              "tokens": 1163
+            }
+          ]
+        },
+        {
+          "trial_index": 14,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2254.4357776641846,
+          "cost": 0.0006677499999999999,
+          "tokens": 2019,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1469.8858261108398,
+              "tokens": 989
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06866455078125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 771.2221145629883,
+              "tokens": 1030
+            }
+          ]
+        },
+        {
+          "trial_index": 15,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4529.513120651245,
+          "cost": 0.0010972500000000001,
+          "tokens": 3289,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1743.4513568878174,
+              "tokens": 1019
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.04696846008300781,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1489.5880222320557,
+              "tokens": 1114
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.05269050598144531,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1283.5240364074707,
+              "tokens": 1156
+            }
+          ]
+        },
+        {
+          "trial_index": 16,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4734.912633895874,
+          "cost": 0.0015705,
+          "tokens": 4682,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1640.6059265136719,
+              "tokens": 1003
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.07867813110351562,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1060.3582859039307,
+              "tokens": 1118
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.05745887756347656,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1321.234941482544,
+              "tokens": 1256
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.0152587890625,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 697.7872848510742,
+              "tokens": 1305
+            }
+          ]
+        },
+        {
+          "trial_index": 17,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3624.3958473205566,
+          "cost": 0.0011775000000000002,
+          "tokens": 3314,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 921.454668045044,
+              "tokens": 926
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.12445449829101562,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1580.9752941131592,
+              "tokens": 1111
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.010967254638671875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1107.6748371124268,
+              "tokens": 1277
+            }
+          ]
+        },
+        {
+          "trial_index": 18,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 4703.607559204102,
+          "cost": 0.001547,
+          "tokens": 4636,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1700.972318649292,
+              "tokens": 1000
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.07581710815429688,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1075.4625797271729,
+              "tokens": 1102
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.10228157043457031,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1316.1814212799072,
+              "tokens": 1241
+            },
+            {
+              "step_index": 5,
+              "step_type": "tool_call",
+              "name": "unit_converter",
+              "duration_ms": 0.01621246337890625,
+              "tokens": 0
+            },
+            {
+              "step_index": 6,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 597.7904796600342,
+              "tokens": 1293
+            }
+          ]
+        },
+        {
+          "trial_index": 19,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2584.67173576355,
+          "cost": 0.0006737500000000001,
+          "tokens": 2027,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1438.1804466247559,
+              "tokens": 993
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.03457069396972656,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1122.3223209381104,
+              "tokens": 1034
+            }
+          ]
+        }
+      ],
+      "failure_attribution": {
+        "most_likely_step": null,
+        "step_divergences": [
+          {
+            "step_index": 0,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 19
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 1,
+            "p_value": 1.0,
+            "successful_actions": {
+              "tool_call:calculator": 18
+            },
+            "failed_actions": {
+              "tool_call:calculator": 1
+            },
+            "most_common_success": "tool_call:calculator",
+            "most_common_fail": "tool_call:calculator",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 2,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 18
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 3,
+            "p_value": 1.0,
+            "successful_actions": {
+              "tool_call:unit_converter": 3,
+              "tool_call:calculator": 10
+            },
+            "failed_actions": {
+              "tool_call:unit_converter": 1
+            },
+            "most_common_success": "tool_call:calculator",
+            "most_common_fail": "tool_call:unit_converter",
+            "raw_p_value": 0.2857142857142857,
+            "significant": false
+          },
+          {
+            "step_index": 4,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 13
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 5,
+            "p_value": 1.0,
+            "successful_actions": {
+              "tool_call:unit_converter": 4
+            },
+            "failed_actions": {
+              "tool_call:unit_converter": 1
+            },
+            "most_common_success": "tool_call:unit_converter",
+            "most_common_fail": "tool_call:unit_converter",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 6,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 4
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 7,
+            "p_value": 1.0,
+            "successful_actions": {
+              "tool_call:calculator": 1
+            },
+            "failed_actions": {
+              "tool_call:calculator": 1
+            },
+            "most_common_success": "tool_call:calculator",
+            "most_common_fail": "tool_call:calculator",
+            "raw_p_value": 1.0,
+            "significant": false
+          },
+          {
+            "step_index": 8,
+            "p_value": 1.0,
+            "successful_actions": {
+              "llm_call:llm_call": 1
+            },
+            "failed_actions": {
+              "llm_call:llm_call": 1
+            },
+            "most_common_success": "llm_call:llm_call",
+            "most_common_fail": "llm_call:llm_call",
+            "raw_p_value": 1.0,
+            "significant": false
+          }
+        ],
+        "failure_patterns": [
+          {
+            "message": "Output must contain at least one of: ['546', '547', '546.875', '546.88']",
+            "count": 1,
+            "percentage": 100.0
+          }
+        ],
+        "recommendation": "No single step shows significant divergence after Benjamini-Hochberg correction. Failures may be due to cumulative errors or random variation."
+      }
+    },
+    {
+      "test_case": {
+        "name": "ambiguous-query",
+        "tags": []
+      },
+      "pass_rate": 1.0,
+      "pass_rate_ci": {
+        "lower": 0.8388748419471806,
+        "upper": 1.0
+      },
+      "mean_cost": 0.0008954125,
+      "cost_ci": {
+        "lower": 0.0008481915625,
+        "upper": 0.0009295084375
+      },
+      "mean_latency_ms": 7463.152229785919,
+      "latency_ci": {
+        "lower": 3154.9219113588338,
+        "upper": 14537.43161529302
+      },
+      "mean_tokens": 2853.25,
+      "trials": [
+        {
+          "trial_index": 0,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3336.4078998565674,
+          "cost": 0.00093375,
+          "tokens": 2971,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1540.4465198516846,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.331878662109375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1153.1081199645996,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.09584426879882812,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 628.8442611694336,
+              "tokens": 1057
+            }
+          ]
+        },
+        {
+          "trial_index": 1,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2958.4202766418457,
+          "cost": 0.0009125,
+          "tokens": 2942,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 969.6826934814453,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.010967254638671875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1265.7654285430908,
+              "tokens": 1003
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.026464462280273438,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 706.5825462341309,
+              "tokens": 1043
+            }
+          ]
+        },
+        {
+          "trial_index": 2,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3772.4790573120117,
+          "cost": 0.0009345,
+          "tokens": 2970,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1255.1217079162598,
+              "tokens": 895
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.04601478576660156,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1078.9661407470703,
+              "tokens": 1017
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.08368492126464844,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1415.757417678833,
+              "tokens": 1058
+            }
+          ]
+        },
+        {
+          "trial_index": 3,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 19997.057676315308,
+          "cost": 0.0009142499999999999,
+          "tokens": 2953,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1109.9154949188232,
+              "tokens": 906
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.010251998901367188,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 18224.54786300659,
+              "tokens": 1004
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.049114227294921875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 647.8030681610107,
+              "tokens": 1043
+            }
+          ]
+        },
+        {
+          "trial_index": 4,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2699.585199356079,
+          "cost": 0.0009225,
+          "tokens": 2958,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1062.427043914795,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.014781951904296875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1029.747486114502,
+              "tokens": 1012
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0286102294921875,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 581.3467502593994,
+              "tokens": 1050
+            }
+          ]
+        },
+        {
+          "trial_index": 5,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2976.1476516723633,
+          "cost": 0.00093625,
+          "tokens": 2973,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1019.6843147277832,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.028133392333984375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1239.1655445098877,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.08535385131835938,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 697.1890926361084,
+              "tokens": 1059
+            }
+          ]
+        },
+        {
+          "trial_index": 6,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2015.3231620788574,
+          "cost": 0.0005967500000000001,
+          "tokens": 1863,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1004.7879219055176,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06747245788574219,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 983.6645126342773,
+              "tokens": 967
+            }
+          ]
+        },
+        {
+          "trial_index": 7,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 59107.47051239014,
+          "cost": 0.0009125,
+          "tokens": 2942,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 56803.88879776001,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.036716461181640625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1671.0960865020752,
+              "tokens": 1003
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.05030632019042969,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 607.501745223999,
+              "tokens": 1043
+            }
+          ]
+        },
+        {
+          "trial_index": 8,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2649.4157314300537,
+          "cost": 0.00093625,
+          "tokens": 2973,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1067.7378177642822,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.010967254638671875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 972.5809097290039,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.030517578125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 595.9789752960205,
+              "tokens": 1059
+            }
+          ]
+        },
+        {
+          "trial_index": 9,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3929.497718811035,
+          "cost": 0.00093625,
+          "tokens": 2973,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 2212.357997894287,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.01430511474609375,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1014.5106315612793,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0629425048828125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 677.7408123016357,
+              "tokens": 1059
+            }
+          ]
+        },
+        {
+          "trial_index": 10,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2813.6868476867676,
+          "cost": 0.00091225,
+          "tokens": 2941,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 968.705415725708,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.03647804260253906,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1147.498607635498,
+              "tokens": 1002
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.1087188720703125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 680.7863712310791,
+              "tokens": 1043
+            }
+          ]
+        },
+        {
+          "trial_index": 11,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3118.967056274414,
+          "cost": 0.00093375,
+          "tokens": 2971,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1062.8538131713867,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.021457672119140625,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1297.9130744934082,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.055789947509765625,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 737.7457618713379,
+              "tokens": 1057
+            }
+          ]
+        },
+        {
+          "trial_index": 12,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 3266.685724258423,
+          "cost": 0.00093625,
+          "tokens": 2973,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1134.6986293792725,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.03600120544433594,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1147.5560665130615,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.05888938903808594,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 968.848705291748,
+              "tokens": 1059
+            }
+          ]
+        },
+        {
+          "trial_index": 13,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2871.4704513549805,
+          "cost": 0.00092125,
+          "tokens": 2953,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 938.6529922485352,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.014781951904296875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1031.3694477081299,
+              "tokens": 1008
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.027894973754882812,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 888.6253833770752,
+              "tokens": 1049
+            }
+          ]
+        },
+        {
+          "trial_index": 14,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2869.2116737365723,
+          "cost": 0.00093625,
+          "tokens": 2973,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1196.8128681182861,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.03409385681152344,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1031.1696529388428,
+              "tokens": 1018
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.028848648071289062,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 618.8037395477295,
+              "tokens": 1059
+            }
+          ]
+        },
+        {
+          "trial_index": 15,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 6133.470773696899,
+          "cost": 0.0009347499999999999,
+          "tokens": 2971,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1524.5239734649658,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.01811981201171875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 3528.5749435424805,
+              "tokens": 1017
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.09584426879882812,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1065.5269622802734,
+              "tokens": 1058
+            }
+          ]
+        },
+        {
+          "trial_index": 16,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2827.465057373047,
+          "cost": 0.00093925,
+          "tokens": 2977,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1110.2712154388428,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.014543533325195312,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1060.8375072479248,
+              "tokens": 1020
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.027418136596679688,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 634.7250938415527,
+              "tokens": 1061
+            }
+          ]
+        },
+        {
+          "trial_index": 17,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2908.017873764038,
+          "cost": 0.0009375,
+          "tokens": 2974,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 996.2077140808105,
+              "tokens": 895
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.0133514404296875,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1105.5922508239746,
+              "tokens": 1019
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.06937980651855469,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 791.8152809143066,
+              "tokens": 1060
+            }
+          ]
+        },
+        {
+          "trial_index": 18,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 2650.634288787842,
+          "cost": 0.00061075,
+          "tokens": 1875,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 980.5350303649902,
+              "tokens": 897
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.0782012939453125,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1654.1860103607178,
+              "tokens": 978
+            }
+          ]
+        },
+        {
+          "trial_index": 19,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 16361.629962921143,
+          "cost": 0.0009107499999999999,
+          "tokens": 2939,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1345.5784320831299,
+              "tokens": 896
+            },
+            {
+              "step_index": 1,
+              "step_type": "tool_call",
+              "name": "date_info",
+              "duration_ms": 0.03504753112792969,
+              "tokens": 0
+            },
+            {
+              "step_index": 2,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 976.5760898590088,
+              "tokens": 1001
+            },
+            {
+              "step_index": 3,
+              "step_type": "tool_call",
+              "name": "calculator",
+              "duration_ms": 0.038623809814453125,
+              "tokens": 0
+            },
+            {
+              "step_index": 4,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 14026.480197906494,
+              "tokens": 1042
+            }
+          ]
+        }
+      ],
+      "failure_attribution": null
+    },
+    {
+      "test_case": {
+        "name": "unnecessary-tool-call",
+        "tags": []
+      },
+      "pass_rate": 1.0,
+      "pass_rate_ci": {
+        "lower": 0.8388748419471806,
+        "upper": 1.0
+      },
+      "mean_cost": 0.00022625000000000002,
+      "cost_ci": {
+        "lower": 0.00021987500000000002,
+        "upper": 0.0002337234375
+      },
+      "mean_latency_ms": 3348.9840984344482,
+      "latency_ci": {
+        "lower": 693.3142384886742,
+        "upper": 9832.986324131434
+      },
+      "mean_tokens": 831.4,
+      "trials": [
+        {
+          "trial_index": 0,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1796.0638999938965,
+          "cost": 0.00022075,
+          "tokens": 827,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1782.6690673828125,
+              "tokens": 827
+            }
+          ]
+        },
+        {
+          "trial_index": 1,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 915.8716201782227,
+          "cost": 0.00027325,
+          "tokens": 869,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 902.6739597320557,
+              "tokens": 869
+            }
+          ]
+        },
+        {
+          "trial_index": 2,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 790.1291847229004,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 765.4480934143066,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 3,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 664.2673015594482,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 637.2103691101074,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 4,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 689.2335414886475,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 658.8609218597412,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 5,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 589.17236328125,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 573.0867385864258,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 6,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 778.7570953369141,
+          "cost": 0.00021825000000000002,
+          "tokens": 825,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 759.5419883728027,
+              "tokens": 825
+            }
+          ]
+        },
+        {
+          "trial_index": 7,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 644.3197727203369,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 631.0145854949951,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 8,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 552.0617961883545,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 526.771068572998,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 9,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 577.2778987884521,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 564.1374588012695,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 10,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 729.1028499603271,
+          "cost": 0.00022325,
+          "tokens": 829,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 715.5544757843018,
+              "tokens": 829
+            }
+          ]
+        },
+        {
+          "trial_index": 11,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 52144.83642578125,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 52121.556520462036,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 12,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 607.4461936950684,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 589.0874862670898,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 13,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 793.1241989135742,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 763.5445594787598,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 14,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 600.9740829467773,
+          "cost": 0.00022075,
+          "tokens": 827,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 577.0132541656494,
+              "tokens": 827
+            }
+          ]
+        },
+        {
+          "trial_index": 15,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 660.5820655822754,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 644.0560817718506,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 16,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 1245.4948425292969,
+          "cost": 0.000257,
+          "tokens": 856,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 1217.752456665039,
+              "tokens": 856
+            }
+          ]
+        },
+        {
+          "trial_index": 17,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 591.9787883758545,
+          "cost": 0.0002195,
+          "tokens": 826,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 578.8974761962891,
+              "tokens": 826
+            }
+          ]
+        },
+        {
+          "trial_index": 18,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 674.7276782989502,
+          "cost": 0.00022075,
+          "tokens": 827,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 651.9043445587158,
+              "tokens": 827
+            }
+          ]
+        },
+        {
+          "trial_index": 19,
+          "passed": true,
+          "failures": [],
+          "duration_ms": 934.260368347168,
+          "cost": 0.000257,
+          "tokens": 856,
+          "steps": [
+            {
+              "step_index": 0,
+              "step_type": "llm_call",
+              "name": "llm_call",
+              "duration_ms": 918.1015491485596,
+              "tokens": 856
+            }
+          ]
+        }
+      ],
+      "failure_attribution": null
+    }
+  ]
+}

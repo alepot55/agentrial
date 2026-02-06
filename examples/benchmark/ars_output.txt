@@ -1,0 +1,10 @@
+
+Agent Reliability Score: 79.7/100
+
+  Accuracy:            94.3  (40%)
+  Consistency:         89.2  (20%)
+  Cost efficiency:     98.4  (10%)
+  Latency:              0.0  (10%)
+  Trajectory quality: 100.0  (10%)
+  Recovery:            42.9  (10%)
+Baseline saved to baseline.json
