@@ -1089,8 +1089,15 @@ def ars_cmd(results_path: str, cost_ceiling: float, latency_ceiling: float) -> N
         report, cost_ceiling=cost_ceiling, latency_ceiling_ms=latency_ceiling
     )
 
-    style = "green" if breakdown.score >= 70 else "yellow" if breakdown.score >= 50 else "red"
-    console.print(f"\n[bold]Agent Reliability Score:[/bold] [{style}]{breakdown.score}/100[/{style}]")
+    if breakdown.score >= 70:
+        style = "green"
+    elif breakdown.score >= 50:
+        style = "yellow"
+    else:
+        style = "red"
+    console.print(
+        f"\n[bold]Agent Reliability Score:[/bold] [{style}]{breakdown.score}/100[/{style}]"
+    )
     console.print()
     console.print(f"  Accuracy:           {breakdown.accuracy:5.1f}  (40%)")
     console.print(f"  Consistency:        {breakdown.consistency:5.1f}  (20%)")

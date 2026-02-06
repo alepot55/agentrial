@@ -15,8 +15,8 @@ The entry point function should return a Suite or list of Suite objects.
 from __future__ import annotations
 
 import importlib.metadata
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
 
 from agentrial.types import Suite
 
@@ -105,7 +105,10 @@ def load_pack(name: str) -> list[Suite]:
         group_eps = [ep for ep in eps if ep.group == ENTRY_POINT_GROUP and ep.name == name]
 
     if not group_eps:
-        raise ValueError(f"Eval pack '{name}' not found. Run 'agentrial packs list' to see available packs.")
+        raise ValueError(
+            f"Eval pack '{name}' not found. "
+            "Run 'agentrial packs list' to see available packs."
+        )
 
     ep = group_eps[0]
     loader = ep.load()
