@@ -45,7 +45,7 @@ def load_config(config_path: Path | None = None) -> Config:
     """Load configuration from file.
 
     Args:
-        config_path: Path to config file. If None, looks for agenteval.yml
+        config_path: Path to config file. If None, looks for agentrial.yml
             in current directory.
 
     Returns:

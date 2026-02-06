@@ -16,9 +16,9 @@ inputs:
     required: false
     default: '0.9'
   config:
-    description: 'Path to agenteval.yml config file'
+    description: 'Path to agentrial.yml config file'
     required: false
-    default: 'agenteval.yml'
+    default: 'agentrial.yml'
   test-path:
     description: 'Path to test files or directory'
     required: false

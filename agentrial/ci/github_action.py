@@ -53,7 +53,7 @@ jobs:
     - name: Upload results
       uses: actions/upload-artifact@v4
       with:
-        name: agenteval-results
+        name: agentrial-results
         path: results.json
 
     - name: Compare with baseline
