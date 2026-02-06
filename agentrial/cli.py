@@ -151,13 +151,18 @@ def run(
         else:
             test_files = discover_test_files(path)
     else:
+        # Auto-discover: search cwd and tests/ directory for test files
         test_files = discover_test_files(Path.cwd())
+        tests_dir = Path.cwd() / "tests"
+        if tests_dir.is_dir():
+            test_files.extend(discover_test_files(tests_dir))
+        test_files = sorted(set(test_files))
 
     if not test_files:
         console.print("[red]No test files found.[/red]")
         console.print(
             "Agentrial looks for files matching test_*.yml, test_*.yaml, "
-            "test_*.py, or agentrial.yml"
+            "or test_*.py in the current directory and tests/."
         )
         console.print("\nTo get started quickly, run:")
         console.print("  [bold]agentrial init[/bold]  — creates a working sample project")
@@ -651,6 +656,372 @@ cases:
         )
     else:
         console.print("\n[dim]All files already exist. Run: agentrial run[/dim]")
+
+
+# --- Snapshot commands ---
+
+
+@main.group()
+def snapshot() -> None:
+    """Manage statistical snapshots."""
+
+
+@snapshot.command("update")
+@click.argument("test_path", type=click.Path(exists=True), required=False)
+@click.option("-n", "--trials", type=int, default=10, help="Number of trials")
+@click.option(
+    "-o", "--output", "output_path", type=click.Path(), help="Snapshot output path"
+)
+def snapshot_update(
+    test_path: str | None, trials: int, output_path: str | None
+) -> None:
+    """Run tests and save results as a new snapshot baseline."""
+    from agentrial.snapshots import create_snapshot, save_snapshot
+
+    cfg_path = None
+    config = load_config(cfg_path)
+    effective_trials = trials or config.trials
+
+    test_files = _resolve_test_files(test_path)
+    if not test_files:
+        console.print("[red]No test files found.[/red]")
+        sys.exit(1)
+
+    _ensure_cwd_in_path()
+    for test_file in test_files:
+        console.print(f"\n[bold]Running:[/bold] {test_file}")
+        suite = load_suite(test_file)
+        engine = MultiTrialEngine(trials=effective_trials)
+        agent = load_agent(suite.agent)
+        suite_result = engine.run_suite(agent, suite)
+        snap = create_snapshot(suite_result)
+        snap_path = save_snapshot(snap, path=output_path)
+        console.print(f"[green]Snapshot saved: {snap_path}[/green]")
+
+
+@snapshot.command("check")
+@click.argument("test_path", type=click.Path(exists=True), required=False)
+@click.option("-n", "--trials", type=int, default=10, help="Number of trials")
+def snapshot_check(test_path: str | None, trials: int) -> None:
+    """Run tests and compare against existing snapshot."""
+    from agentrial.snapshots import (
+        compare_with_snapshot,
+        find_snapshot,
+        load_snapshot,
+        print_snapshot_comparison,
+    )
+
+    cfg_path = None
+    config = load_config(cfg_path)
+    effective_trials = trials or config.trials
+
+    test_files = _resolve_test_files(test_path)
+    if not test_files:
+        console.print("[red]No test files found.[/red]")
+        sys.exit(1)
+
+    _ensure_cwd_in_path()
+    any_regression = False
+    for test_file in test_files:
+        console.print(f"\n[bold]Running:[/bold] {test_file}")
+        suite = load_suite(test_file)
+        engine = MultiTrialEngine(trials=effective_trials)
+        agent = load_agent(suite.agent)
+        suite_result = engine.run_suite(agent, suite)
+
+        snap_path = find_snapshot(suite.name)
+        if not snap_path:
+            console.print(
+                f"[yellow]No snapshot found for '{suite.name}'. "
+                f"Run 'agentrial snapshot update' first.[/yellow]"
+            )
+            continue
+
+        snap = load_snapshot(snap_path)
+        comparison = compare_with_snapshot(suite_result, snap)
+        print_snapshot_comparison(comparison, console)
+        if not comparison.overall_passed:
+            any_regression = True
+
+    sys.exit(1 if any_regression else 0)
+
+
+# --- Security commands ---
+
+
+@main.group()
+def security() -> None:
+    """MCP security scanning."""
+
+
+@security.command("scan")
+@click.option(
+    "--mcp-config",
+    "mcp_config",
+    type=click.Path(exists=True),
+    required=True,
+    help="Path to MCP config JSON file",
+)
+@click.option(
+    "-o", "--output", "output_path", type=click.Path(), help="Save results as JSON"
+)
+def security_scan(mcp_config: str, output_path: str | None) -> None:
+    """Scan an MCP configuration for security vulnerabilities."""
+    import json as json_mod
+
+    from agentrial.security.scanner import print_scan_result, scan_mcp_config
+
+    result = scan_mcp_config(config_path=mcp_config)
+    print_scan_result(result, console)
+
+    if output_path:
+        report = {
+            "score": result.score,
+            "passed": result.passed,
+            "servers_scanned": result.servers_scanned,
+            "tools_scanned": result.tools_scanned,
+            "findings": [
+                {
+                    "severity": f.severity.value,
+                    "category": f.category,
+                    "title": f.title,
+                    "description": f.description,
+                    "tool_name": f.tool_name,
+                    "server_name": f.server_name,
+                }
+                for f in result.findings
+            ],
+        }
+        Path(output_path).write_text(json_mod.dumps(report, indent=2))
+        console.print(f"[dim]Report saved to {output_path}[/dim]")
+
+    sys.exit(0 if result.passed else 1)
+
+
+# --- Pareto commands ---
+
+
+@main.command("pareto")
+@click.option(
+    "--models",
+    required=True,
+    help="Comma-separated list of model names",
+)
+@click.option("-n", "--trials", type=int, default=10, help="Trials per model")
+@click.argument("test_path", type=click.Path(exists=True), required=False)
+def pareto_cmd(models: str, trials: int, test_path: str | None) -> None:
+    """Run Pareto frontier analysis across models.
+
+    Evaluates the same test suite with different models and identifies
+    which models are Pareto-optimal (best cost-accuracy trade-off).
+    """
+    from agentrial.pareto import analyze_from_results, print_pareto
+
+    model_list = [m.strip() for m in models.split(",")]
+    test_files = _resolve_test_files(test_path)
+    if not test_files:
+        console.print("[red]No test files found.[/red]")
+        sys.exit(1)
+
+    _ensure_cwd_in_path()
+    test_file = test_files[0]
+    suite = load_suite(test_file)
+
+    console.print(
+        f"[bold]Pareto analysis:[/bold] {suite.name} with "
+        f"{len(model_list)} models x {trials} trials"
+    )
+
+    model_results = {}
+    for model_name in model_list:
+        console.print(f"  Running model: {model_name}...")
+        engine = MultiTrialEngine(trials=trials, show_progress=False)
+        agent = load_agent(suite.agent)
+        result = engine.run_suite(agent, suite)
+        model_results[model_name] = {
+            "pass_rate": result.overall_pass_rate,
+            "mean_cost": result.total_cost / max(len(result.results), 1),
+            "mean_latency_ms": result.total_duration_ms / max(len(result.results), 1),
+            "trials": trials,
+        }
+
+    pareto_result = analyze_from_results(model_results)
+    print_pareto(pareto_result, console)
+
+
+# --- Prompt commands ---
+
+
+@main.group()
+def prompt() -> None:
+    """Prompt version control."""
+
+
+@prompt.command("track")
+@click.argument("prompt_file", type=click.Path(exists=True))
+@click.option("--version", "version_name", help="Explicit version name")
+@click.option("--tag", multiple=True, help="Tags in key=value format")
+def prompt_track(
+    prompt_file: str, version_name: str | None, tag: tuple[str, ...]
+) -> None:
+    """Track a new prompt version from a file."""
+    from agentrial.prompts import PromptStore
+
+    text = Path(prompt_file).read_text()
+    tags = {}
+    for t in tag:
+        if "=" in t:
+            k, v = t.split("=", 1)
+            tags[k] = v
+
+    store = PromptStore()
+    pv = store.track(text, version=version_name, tags=tags or None)
+    console.print(
+        f"[green]Tracked prompt version {pv.version}[/green] "
+        f"(hash: {pv.hash})"
+    )
+
+
+@prompt.command("diff")
+@click.argument("version_a")
+@click.argument("version_b")
+def prompt_diff(version_a: str, version_b: str) -> None:
+    """Show diff between two prompt versions."""
+    from agentrial.prompts import PromptStore, print_prompt_diff
+
+    store = PromptStore()
+    try:
+        diff = store.diff(version_a, version_b)
+    except ValueError as e:
+        console.print(f"[red]{e}[/red]")
+        sys.exit(1)
+    print_prompt_diff(diff, console)
+
+
+@prompt.command("list")
+def prompt_list() -> None:
+    """List all tracked prompt versions."""
+    from agentrial.prompts import PromptStore
+
+    store = PromptStore()
+    versions = store.list_versions()
+    if not versions:
+        console.print("[dim]No prompt versions tracked yet.[/dim]")
+        return
+    for v in versions:
+        pv = store.get_version(v)
+        if pv:
+            preview = pv.prompt_text[:60].replace("\n", " ")
+            console.print(f"  {pv.version}  {pv.hash}  {preview}...")
+        else:
+            console.print(f"  {v}")
+
+
+# --- Monitor commands ---
+
+
+@main.command("monitor")
+@click.option(
+    "--baseline",
+    "baseline_path",
+    type=click.Path(exists=True),
+    required=True,
+    help="Path to baseline snapshot JSON",
+)
+@click.option("--dry-run", is_flag=True, help="Show detector config without running")
+@click.option("--window", type=int, default=50, help="Sliding window size")
+@click.option("--threshold", type=float, default=5.0, help="CUSUM threshold")
+def monitor_cmd(
+    baseline_path: str, dry_run: bool, window: int, threshold: float
+) -> None:
+    """Configure production drift monitoring from a baseline snapshot."""
+    import json as json_mod
+
+    from agentrial.monitor import DriftDetector
+
+    baseline = json_mod.loads(Path(baseline_path).read_text())
+
+    baseline_pass_rate = baseline.get("overall", {}).get("pass_rate", 0.85)
+
+    # Collect baseline cost/latency values from cases
+    baseline_costs: list[float] = []
+    baseline_latencies: list[float] = []
+    for case in baseline.get("cases", []):
+        metrics = case.get("metrics", {})
+        baseline_costs.extend(metrics.get("cost", {}).get("values", []))
+        baseline_latencies.extend(metrics.get("latency", {}).get("values", []))
+
+    detector = DriftDetector(
+        baseline_pass_rate=baseline_pass_rate,
+        baseline_costs=baseline_costs or None,
+        baseline_latencies=baseline_latencies or None,
+        cusum_threshold=threshold,
+        window_size=window,
+    )
+
+    if dry_run:
+        console.print("[bold]Drift detector configuration:[/bold]")
+        console.print(f"  Baseline pass rate: {baseline_pass_rate:.0%}")
+        console.print(f"  CUSUM threshold: {threshold}")
+        console.print(f"  Window size: {window}")
+        console.print(f"  Baseline costs: {len(baseline_costs)} samples")
+        console.print(f"  Baseline latencies: {len(baseline_latencies)} samples")
+        console.print("\n[dim]Detector ready. Use the Python API to feed observations.[/dim]")
+        return
+
+    console.print(
+        f"[bold]Monitor initialized[/bold] "
+        f"(baseline: {baseline_pass_rate:.0%}, window: {window})"
+    )
+    console.print("[dim]Feed observations via the Python API:[/dim]")
+    console.print("  from agentrial.monitor import DriftDetector, Observation")
+    console.print(f"  detector = DriftDetector(baseline_pass_rate={baseline_pass_rate})")
+    console.print("  alerts = detector.observe(Observation(passed=True, cost=0.01))")
+
+
+# --- Dashboard command ---
+
+
+@main.command("dashboard")
+@click.option("--port", type=int, default=8080, help="Server port")
+@click.option("--host", default="127.0.0.1", help="Server host")
+@click.option(
+    "--data-dir", type=click.Path(), help="Data directory for persistence"
+)
+def dashboard_cmd(port: int, host: str, data_dir: str | None) -> None:
+    """Launch the cloud dashboard web server."""
+    try:
+        import uvicorn
+    except ImportError:
+        console.print(
+            "[red]uvicorn not installed. Install with: "
+            "pip install 'agentrial[dashboard]'[/red]"
+        )
+        sys.exit(1)
+
+    from agentrial.dashboard.app import create_app
+
+    app = create_app(data_dir=data_dir)
+    console.print(f"[bold]Starting dashboard at http://{host}:{port}[/bold]")
+    uvicorn.run(app, host=host, port=port)
+
+
+# --- Helper ---
+
+
+def _resolve_test_files(test_path: str | None) -> list[Path]:
+    """Resolve test files from a path argument or auto-discover."""
+    if test_path:
+        path = Path(test_path)
+        if path.is_file():
+            return [path]
+        return discover_test_files(path)
+
+    test_files = discover_test_files(Path.cwd())
+    tests_dir = Path.cwd() / "tests"
+    if tests_dir.is_dir():
+        test_files.extend(discover_test_files(tests_dir))
+    return sorted(set(test_files))
 
 
 if __name__ == "__main__":
