@@ -226,7 +226,8 @@ def discover_test_files(directory: Path, pattern: str = "test_*.yml") -> list[Pa
     Looks for test files with the following patterns:
     - test_*.yml / test_*.yaml (standard test files)
     - test_*.py (Python test files)
-    - agentrial.yml / agentrial.yaml (project-level test suites)
+
+    Note: agentrial.yml/yaml is treated as CONFIG only, not a test file.
 
     Args:
         directory: Directory to search.
@@ -240,9 +241,4 @@ def discover_test_files(directory: Path, pattern: str = "test_*.yml") -> list[Pa
     files.extend(directory.glob("test_*.yaml"))
     # Also look for Python test files
     files.extend(directory.glob("test_*.py"))
-    # Also look for agentrial.yml/yaml as valid test suite files
-    for name in ("agentrial.yml", "agentrial.yaml"):
-        agentrial_file = directory / name
-        if agentrial_file.exists():
-            files.append(agentrial_file)
     return sorted(set(files))  # Remove duplicates and sort

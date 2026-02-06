@@ -68,6 +68,43 @@ class TestFunctionAdapter:
         adapter = FunctionAdapter(my_agent)
         assert adapter.get_agent_callable() is adapter
 
+    def test_none_return_is_failure(self) -> None:
+        """Agent returning None should produce success=False (M1)."""
+
+        def none_agent(inp: AgentInput):
+            return None
+
+        adapter = FunctionAdapter(none_agent)
+        result = adapter(AgentInput(query="test"))
+        assert not result.success
+        assert result.output == ""
+        assert "None" in result.error
+
+
+# --- smolagents naming tests ---
+
+
+class TestSmolAgentsNaming:
+    """Tests for wrap_smolagents_agent naming (M2)."""
+
+    def test_new_name_exists(self) -> None:
+        from agentrial.runner.adapters.smolagents import wrap_smolagents_agent
+
+        assert callable(wrap_smolagents_agent)
+
+    def test_alias_still_works(self) -> None:
+        from agentrial.runner.adapters.smolagents import (
+            wrap_smolagent,
+            wrap_smolagents_agent,
+        )
+
+        assert wrap_smolagent is wrap_smolagents_agent
+
+    def test_lazy_import_new_name(self) -> None:
+        from agentrial.runner.adapters import wrap_smolagents_agent
+
+        assert callable(wrap_smolagents_agent)
+
 
 # --- CrewAI adapter tests ---
 
@@ -498,3 +535,11 @@ class TestLazyImports:
 
         assert BaseAdapter is not None
         assert wrap_langgraph_agent is not None
+
+    def test_langgraph_adapter_inherits_base(self) -> None:
+        """LangGraphAdapter should be an instance of BaseAdapter (H6)."""
+        from agentrial.runner.adapters.base import BaseAdapter
+        from agentrial.runner.adapters.langgraph import LangGraphAdapter
+
+        adapter = LangGraphAdapter(graph=MagicMock())
+        assert isinstance(adapter, BaseAdapter)

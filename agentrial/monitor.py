@@ -71,6 +71,7 @@ class CUSUMDetector:
         target: float,
         threshold: float = 5.0,
         drift_magnitude: float = 0.1,
+        min_observations: int = 30,
     ) -> None:
         """Initialize CUSUM detector.
 
@@ -78,13 +79,23 @@ class CUSUMDetector:
             target: Expected (baseline) value of the metric.
             threshold: Decision threshold h (higher = less sensitive).
             drift_magnitude: Minimum shift to detect (delta/2 in CUSUM).
+            min_observations: Minimum observations before detecting drift.
+                During warmup, observations are counted but drift is not
+                signaled. After warmup, cumulative sums are reset.
         """
         self.target = target
         self.threshold = threshold
         self.allowance = drift_magnitude / 2  # k in CUSUM formula
+        self.min_observations = min_observations
         self.s_high = 0.0  # Upper CUSUM
         self.s_low = 0.0  # Lower CUSUM
         self.count = 0
+        self._warmup_done = False
+
+    @property
+    def drift_detected(self) -> bool:
+        """Whether either CUSUM statistic exceeds the threshold."""
+        return self.s_high > self.threshold or self.s_low > self.threshold
 
     def update(self, value: float) -> DriftAlert | None:
         """Update with a new observation.
@@ -96,6 +107,15 @@ class CUSUMDetector:
             DriftAlert if drift detected, None otherwise.
         """
         self.count += 1
+
+        # During warmup: accumulate count but don't detect
+        if not self._warmup_done:
+            if self.count >= self.min_observations:
+                self._warmup_done = True
+                # Reset cumulative sums after warmup
+                self.s_high = 0.0
+                self.s_low = 0.0
+            return None
 
         # Update cumulative sums
         self.s_high = max(0, self.s_high + (value - self.target) - self.allowance)
@@ -141,6 +161,7 @@ class CUSUMDetector:
         self.s_high = 0.0
         self.s_low = 0.0
         self.count = 0
+        self._warmup_done = False
 
 
 class PageHinkleyDetector:
@@ -359,7 +380,10 @@ class SlidingWindowDetector:
         n: int,
         expected_rate: float,
     ) -> float:
-        """Two-proportion z-test approximation.
+        """Proportion test: Fisher exact for small n, z-test for large n.
+
+        Uses Fisher's exact test when window_size < 30 (small-sample safe),
+        falls back to normal approximation for larger windows.
 
         Args:
             successes: Number of successes in window.
@@ -371,6 +395,10 @@ class SlidingWindowDetector:
         """
         if n == 0:
             return 1.0
+
+        # For small windows, use Fisher's exact test
+        if n < 30:
+            return self._fisher_exact(successes, n, expected_rate)
 
         observed_rate = successes / n
 
@@ -397,9 +425,81 @@ class SlidingWindowDetector:
         p_value = 2 * (1 - _normal_cdf(abs(z)))
         return p_value
 
+    def _fisher_exact(
+        self,
+        successes: int,
+        n: int,
+        expected_rate: float,
+    ) -> float:
+        """Fisher's exact test for 2x2 contingency table.
+
+        Constructs a table from observed vs baseline proportions and
+        computes a two-tailed p-value.
+        """
+        # Build 2x2 contingency table:
+        #           pass  fail
+        # window:    a     b
+        # baseline:  c     d
+        a = successes
+        b = n - successes
+        baseline_pass = round(expected_rate * self.baseline_n)
+        c = baseline_pass
+        d = self.baseline_n - baseline_pass
+
+        return _fisher_exact_2x2(a, b, c, d)
+
     def reset(self) -> None:
         """Reset the window."""
         self._window = []
+
+
+def _fisher_exact_2x2(a: int, b: int, c: int, d: int) -> float:
+    """Two-tailed Fisher's exact test for a 2x2 contingency table.
+
+    Uses the hypergeometric distribution to compute the exact p-value.
+    """
+    n = a + b + c + d
+    if n == 0:
+        return 1.0
+
+    def _log_factorial(x: int) -> float:
+        result = 0.0
+        for i in range(2, x + 1):
+            result += math.log(i)
+        return result
+
+    # P(table) under null
+    def _table_prob(aa: int, bb: int, cc: int, dd: int) -> float:
+        numerator = (
+            _log_factorial(aa + bb) + _log_factorial(cc + dd)
+            + _log_factorial(aa + cc) + _log_factorial(bb + dd)
+        )
+        denominator = (
+            _log_factorial(n)
+            + _log_factorial(aa) + _log_factorial(bb)
+            + _log_factorial(cc) + _log_factorial(dd)
+        )
+        return math.exp(numerator - denominator)
+
+    p_observed = _table_prob(a, b, c, d)
+
+    # Sum probabilities of all tables as extreme or more extreme
+    row1 = a + b
+    row2 = c + d
+    col1 = a + c
+
+    p_value = 0.0
+    for aa in range(0, min(row1, col1) + 1):
+        bb = row1 - aa
+        cc = col1 - aa
+        dd = row2 - cc
+        if bb < 0 or cc < 0 or dd < 0:
+            continue
+        p_table = _table_prob(aa, bb, cc, dd)
+        if p_table <= p_observed + 1e-12:
+            p_value += p_table
+
+    return min(1.0, p_value)
 
 
 def _normal_cdf(x: float) -> float:
@@ -488,6 +588,11 @@ class DriftDetector:
         cusum_alert = self.cusum.update(value)
         if cusum_alert:
             alerts.append(cusum_alert)
+
+        ph_alert = self.page_hinkley.update(value)
+        if ph_alert:
+            ph_alert.metric = "pass_rate"
+            alerts.append(ph_alert)
 
         window_alert = self.sliding_window.update(obs.passed)
         if window_alert:

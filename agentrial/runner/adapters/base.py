@@ -75,6 +75,14 @@ class FunctionAdapter(BaseAdapter):
         if isinstance(result, AgentOutput):
             return result
 
+        # None return → explicit failure
+        if result is None:
+            return AgentOutput(
+                output="",
+                success=False,
+                error="Agent returned None",
+            )
+
         # Convert dict to AgentOutput
         if isinstance(result, dict):
             from agentrial.types import AgentMetadata

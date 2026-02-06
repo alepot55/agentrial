@@ -270,3 +270,32 @@ class TestPromptComparison:
             significant=False,
         )
         assert not comp.significant
+
+
+class TestCorruptPromptJSON:
+    """Tests for corrupt JSON handling in PromptStore (M5)."""
+
+    def test_corrupt_version_returns_none(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            store = PromptStore(base_dir=tmpdir)
+            store.track("good prompt")  # v1
+
+            # Corrupt the file
+            corrupt_path = Path(tmpdir) / "v1.json"
+            corrupt_path.write_text("{invalid json")
+
+            result = store.get_version("v1")
+            assert result is None
+
+    def test_corrupt_file_skipped_in_list(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            store = PromptStore(base_dir=tmpdir)
+            store.track("prompt a")  # v1
+            store.track("prompt b")  # v2
+
+            # Corrupt v1
+            (Path(tmpdir) / "v1.json").write_text("not json!")
+
+            versions = store.list_versions()
+            assert "v1" not in versions
+            assert "v2" in versions

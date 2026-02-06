@@ -153,11 +153,14 @@ class AutoGenAdapter(BaseAdapter):
 
         try:
             loop = asyncio.get_running_loop()
+            # Already inside an event loop — run in a thread to avoid blocking
             import concurrent.futures
 
             with concurrent.futures.ThreadPoolExecutor() as pool:
-                return loop.run_in_executor(pool, asyncio.run, _execute())  # type: ignore[arg-type]
+                future = pool.submit(asyncio.run, _execute())
+                return future.result()
         except RuntimeError:
+            # No running event loop — safe to use asyncio.run directly
             return asyncio.run(_execute())
 
     def _run_legacy(self, input: AgentInput, recorder: TrajectoryRecorder) -> str:

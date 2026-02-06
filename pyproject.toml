@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentrial"
-version = "0.1.4"
+version = "0.2.0a1"
 description = "Statistical evaluation framework for AI agents - pytest for agent trajectories"
 readme = "README.md"
 license = "MIT"
@@ -52,14 +52,51 @@ langgraph = [
     "langgraph>=0.2.0",
     "langchain-core>=0.2.0",
 ]
+crewai = [
+    "crewai>=0.1.0",
+]
+autogen = [
+    "autogen-agentchat>=0.4.0",
+]
+pydantic-ai = [
+    "pydantic-ai>=0.1.0",
+]
+openai-agents = [
+    "openai-agents>=0.1.0",
+]
+smolagents = [
+    "smolagents>=0.1.0",
+]
+judge = [
+    "litellm>=1.0.0",
+]
+dashboard = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+]
+all = [
+    "agentrial[langgraph]",
+    "agentrial[crewai]",
+    "agentrial[autogen]",
+    "agentrial[pydantic-ai]",
+    "agentrial[openai-agents]",
+    "agentrial[smolagents]",
+    "agentrial[judge]",
+    "agentrial[dashboard]",
+]
 
 [project.scripts]
 agentrial = "agentrial.cli:main"
 
+[project.entry-points."pytest11"]
+agentrial = "agentrial.pytest_plugin"
+
 [project.urls]
-Homepage = "https://github.com/agentrial/agentrial"
-Documentation = "https://github.com/agentrial/agentrial#readme"
-Repository = "https://github.com/agentrial/agentrial"
+Homepage = "https://github.com/alepot55/agentrial"
+Documentation = "https://github.com/alepot55/agentrial#readme"
+Repository = "https://github.com/alepot55/agentrial"
+Issues = "https://github.com/alepot55/agentrial/issues"
+Changelog = "https://github.com/alepot55/agentrial/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["agentrial"]

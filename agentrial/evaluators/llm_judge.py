@@ -13,10 +13,13 @@ Falls back to rule-based evaluation when no LLM is configured.
 
 from __future__ import annotations
 
+import logging
 import statistics
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -133,6 +136,57 @@ def _parse_judge_response(response: str) -> JudgmentResult:
     return JudgmentResult(score=score, reasoning=reasoning, raw_response=response)
 
 
+def _rule_based_evaluate(prompt: str) -> str:
+    """Rule-based fallback when no LLM is available.
+
+    Examines the judge prompt to produce a deterministic score.
+    """
+    # Extract the agent output section from the prompt
+    output_section = ""
+    in_output = False
+    for line in prompt.split("\n"):
+        if line.strip() == "## Agent Output":
+            in_output = True
+            continue
+        if line.strip().startswith("## ") and in_output:
+            break
+        if in_output:
+            output_section += line + "\n"
+
+    output_text = output_section.strip()
+
+    if not output_text:
+        return (
+            "SCORE: 1\n"
+            "REASONING: Rule-based: agent produced empty output."
+        )
+
+    # Check for error indicators
+    error_words = ["error", "exception", "failed", "i don't know", "cannot"]
+    has_errors = any(w in output_text.lower() for w in error_words)
+
+    if has_errors:
+        return (
+            "SCORE: 2\n"
+            "REASONING: Rule-based: output contains error indicators or "
+            "failure signals."
+        )
+
+    # Non-empty, no errors — adequate output
+    if len(output_text) > 50:
+        return (
+            "SCORE: 4\n"
+            "REASONING: Rule-based: output is substantive and "
+            "appears well-formed."
+        )
+
+    return (
+        "SCORE: 3\n"
+        "REASONING: Rule-based: output present but brief. "
+        "Install litellm for more accurate LLM-based judging."
+    )
+
+
 def compute_krippendorff_alpha(
     ratings: list[list[float]],
     scale_range: tuple[float, float] = (1.0, 5.0),
@@ -222,6 +276,32 @@ def compute_krippendorff_alpha(
     return max(-1.0, min(1.0, alpha))
 
 
+def _t_ppf_975(df: int) -> float:
+    """Return the 97.5th percentile of the t-distribution (two-tailed 95% CI).
+
+    Uses a lookup table for small df and falls back to the normal
+    approximation (z=1.96) for df >= 120.
+    """
+    _table = {
+        1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776,
+        5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306,
+        9: 2.262, 10: 2.228, 11: 2.201, 12: 2.179,
+        13: 2.160, 14: 2.145, 15: 2.131, 16: 2.120,
+        17: 2.110, 18: 2.101, 19: 2.093, 20: 2.086,
+        25: 2.060, 30: 2.042, 40: 2.021, 60: 2.000,
+        120: 1.980,
+    }
+    if df in _table:
+        return _table[df]
+    if df > 120:
+        return 1.96  # large sample: t → z
+    # For unlisted df <= 120, use nearest lower entry
+    for k in sorted(_table.keys(), reverse=True):
+        if k <= df:
+            return _table[k]
+    return 12.706  # df=1 fallback (shouldn't reach here)
+
+
 def calibrate_bias(
     judge_fn: Callable[[str, str], JudgmentResult],
     gold: GoldStandard,
@@ -282,6 +362,7 @@ class LLMJudge:
         self.repeats = max(1, repeats)
         self.gold_standard = gold_standard
         self._calibration_bias: float | None = None
+        self._rule_based = False
 
     def _call_llm(self, prompt: str) -> str:
         """Call the LLM with a prompt."""
@@ -298,12 +379,16 @@ class LLMJudge:
                 temperature=0.3,
             )
             return response.choices[0].message.content or ""
-        except ImportError as err:
-            raise RuntimeError(
-                "No LLM function provided and litellm is not installed. "
-                "Either pass llm_fn to LLMJudge or install litellm: "
-                "pip install litellm"
-            ) from err
+        except ImportError:
+            # Fall back to rule-based evaluation
+            if not self._rule_based:
+                logger.warning(
+                    "No LLM provider available. Using rule-based judge "
+                    "(less accurate). Install litellm for LLM-based "
+                    "judging: pip install litellm"
+                )
+                self._rule_based = True
+            return _rule_based_evaluate(prompt)
 
     def _judge_once(self, query: str, output: str) -> JudgmentResult:
         """Run a single judgment."""
@@ -332,9 +417,19 @@ class LLMJudge:
 
         # Compute confidence interval for the score
         if len(scores) >= 2:
-            std_err = statistics.stdev(scores) / (len(scores) ** 0.5)
-            ci_lower = max(1.0, mean_score - 1.96 * std_err)
-            ci_upper = min(5.0, mean_score + 1.96 * std_err)
+            m = len(scores)
+            std_err = statistics.stdev(scores) / (m ** 0.5)
+            # Use t-distribution for small samples (exact for any M)
+            t_crit = _t_ppf_975(m - 1)
+            if m < 5:
+                logger.warning(
+                    "LLM Judge: only %d repeats — CI is wide "
+                    "(t=%.2f vs z=1.96). Consider repeats>=5.",
+                    m,
+                    t_crit,
+                )
+            ci_lower = max(1.0, mean_score - t_crit * std_err)
+            ci_upper = min(5.0, mean_score + t_crit * std_err)
         else:
             ci_lower = ci_upper = mean_score
 

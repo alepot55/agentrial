@@ -148,6 +148,8 @@ class TestCase:
         tags: Optional tags for filtering.
     """
 
+    __test__ = False  # Prevent pytest from collecting this dataclass
+
     name: str
     input: AgentInput
     expected: ExpectedOutput | None = None

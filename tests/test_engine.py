@@ -257,3 +257,39 @@ class TestMultiTrialEngine:
         assert not result.passed
         assert any("agent failed" in f.lower() for f in result.failures)
         assert any("authentication" in f.lower() for f in result.failures)
+
+    def test_agent_returns_none(self) -> None:
+        """Test that agent returning None is handled gracefully."""
+        engine = MultiTrialEngine(trials=1)
+
+        def none_agent(input: AgentInput) -> AgentOutput:
+            return None  # type: ignore[return-value]
+
+        test_case = TestCase(
+            name="test",
+            input=AgentInput(query="test"),
+        )
+
+        result = engine.run_single_trial(none_agent, test_case, 0)
+
+        assert not result.passed
+        assert any("invalid type" in f.lower() for f in result.failures)
+
+    def test_agent_returns_wrong_type(self) -> None:
+        """Test that agent returning wrong type is handled gracefully."""
+        engine = MultiTrialEngine(trials=1)
+
+        def string_agent(input: AgentInput) -> AgentOutput:
+            return "just a string"  # type: ignore[return-value]
+
+        test_case = TestCase(
+            name="test",
+            input=AgentInput(query="test"),
+        )
+
+        result = engine.run_single_trial(string_agent, test_case, 0)
+
+        assert not result.passed
+        assert any("invalid type" in f.lower() for f in result.failures)
+        # Output should still be captured as string
+        assert result.agent_output.output == "just a string"

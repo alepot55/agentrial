@@ -6,6 +6,7 @@ from agentrial.evaluators.llm_judge import (
     LLMJudge,
     Rubric,
     _parse_judge_response,
+    _t_ppf_975,
     compute_krippendorff_alpha,
 )
 
@@ -57,16 +58,17 @@ class TestKrippendorffAlpha:
 
     def test_high_agreement(self) -> None:
         # Raters mostly agree (4, 4, 5 on 1-5 scale)
+        # Expected alpha ≈ 0.958 (Do/De = 0.33/8.0 → 1 - 0.042)
         ratings = [[4.0, 4.0, 5.0]]
         alpha = compute_krippendorff_alpha(ratings)
-        # Disagreement is (1^2)/3 = 0.33, max is 16, so alpha = 1 - 0.33/16 ≈ 0.98
-        assert alpha > 0.9
+        assert alpha > 0.95  # Near-perfect agreement
 
     def test_low_agreement(self) -> None:
         # Raters disagree significantly (1 and 5 on 1-5 scale)
+        # Expected alpha ≈ 0.33 — well below acceptable reliability
         ratings = [[1.0, 5.0, 1.0, 5.0]]
         alpha = compute_krippendorff_alpha(ratings)
-        assert alpha < 0.9
+        assert alpha < 0.4  # Max disagreement on 1-5 scale
 
     def test_single_rating(self) -> None:
         # Single rating => trivially perfect
@@ -80,12 +82,13 @@ class TestKrippendorffAlpha:
 
     def test_multiple_items(self) -> None:
         # Two items, each with 3 ratings
+        # Expected alpha ≈ 0.545 — moderate agreement
         ratings = [
             [4.0, 4.0, 5.0],  # High agreement
             [2.0, 3.0, 2.0],  # Moderate agreement
         ]
         alpha = compute_krippendorff_alpha(ratings)
-        assert -1.0 <= alpha <= 1.0
+        assert 0.4 < alpha < 0.7  # Moderate, not perfect
 
 
 class TestLLMJudge:
@@ -186,15 +189,15 @@ class TestLLMJudge:
         assert result.mean_score == 3.5
         assert result.alpha == 1.0
 
-    def test_no_llm_raises(self) -> None:
-        """Test that missing LLM function raises appropriate error."""
+    def test_no_llm_falls_back_to_rule_based(self) -> None:
+        """Test that missing LLM function falls back to rule-based judge."""
         rubric = Rubric(criteria="Check")
         judge = LLMJudge(rubric=rubric, llm_fn=None, repeats=1)
 
-        import pytest
-
-        with pytest.raises(RuntimeError, match="litellm"):
-            judge.evaluate("q", "a")
+        result = judge.evaluate("q", "a")
+        assert judge._rule_based is True
+        assert result.mean_score >= 1.0
+        assert result.mean_score <= 5.0
 
 
 class TestCalibratedJudgment:
@@ -229,3 +232,82 @@ class TestCalibratedJudgment:
             reasoning_samples=["Good", "Correct"],
         )
         assert len(j.reasoning_samples) == 2
+
+
+class TestTDistribution:
+    """Tests for t-distribution CI (H1 fix)."""
+
+    def test_t_ppf_975_known_values(self) -> None:
+        assert _t_ppf_975(1) == 12.706
+        assert _t_ppf_975(2) == 4.303
+        assert _t_ppf_975(30) == 2.042
+        assert _t_ppf_975(120) == 1.980
+
+    def test_t_ppf_975_large_df_fallback(self) -> None:
+        # df > 120 should use 1.96 fallback
+        assert _t_ppf_975(500) == 1.96
+
+    def test_ci_uses_t_distribution(self) -> None:
+        """With M=3, CI should be wider than z=1.96 would give."""
+        call_count = 0
+
+        def varying_llm(prompt: str) -> str:
+            nonlocal call_count
+            scores = [3.0, 4.0, 5.0]
+            score = scores[call_count % len(scores)]
+            call_count += 1
+            return f"SCORE: {score}\nREASONING: Test."
+
+        rubric = Rubric(criteria="Test")
+        judge = LLMJudge(rubric=rubric, llm_fn=varying_llm, repeats=3)
+        result = judge.evaluate("q", "a")
+
+        # With t(df=2)=4.303 vs z=1.96, CI should be wider
+        # stdev([3,4,5]) = 1.0, std_err = 1/sqrt(3) ≈ 0.577
+        # z-CI width: 2 * 1.96 * 0.577 ≈ 2.26
+        # t-CI width: 2 * 4.303 * 0.577 ≈ 4.97
+        ci_width = result.score_ci[1] - result.score_ci[0]
+        # t-CI should be wider than z-CI would be
+        z_ci_width = 2 * 1.96 * 1.0 / (3 ** 0.5)
+        assert ci_width > z_ci_width
+
+    def test_ci_warning_for_small_m(self) -> None:
+        """Verify warning is logged when M < 5."""
+        import logging
+
+        rubric = Rubric(criteria="Test")
+        judge = LLMJudge(
+            rubric=rubric,
+            llm_fn=lambda p: "SCORE: 4\nREASONING: ok",
+            repeats=3,
+        )
+
+        logger = logging.getLogger("agentrial.evaluators.llm_judge")
+        with unittest_mock_handler(logger) as handler:
+            result = judge.evaluate("q", "a")
+            assert result.mean_score == 4.0
+            # Check that a warning was logged about small M
+            warnings = [
+                r for r in handler.records if r.levelno == logging.WARNING
+            ]
+            assert any("only 3 repeats" in r.getMessage() for r in warnings)
+
+
+def unittest_mock_handler(lgr: "logging.Logger"):
+    """Context manager that attaches a handler to capture log records."""
+    import contextlib
+    import logging
+
+    @contextlib.contextmanager
+    def _ctx():
+        handler = logging.Handler()
+        handler.records: list[logging.LogRecord] = []  # type: ignore[attr-defined]
+        original_emit = handler.emit
+        handler.emit = lambda record: handler.records.append(record)  # type: ignore[assignment]
+        lgr.addHandler(handler)
+        try:
+            yield handler
+        finally:
+            lgr.removeHandler(handler)
+
+    return _ctx()

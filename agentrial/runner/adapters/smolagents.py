@@ -169,7 +169,7 @@ class SmolAgentsAdapter(BaseAdapter):
         return self
 
 
-def wrap_smolagent(
+def wrap_smolagents_agent(
     agent: Any,
 ) -> Callable[[AgentInput], AgentOutput]:
     """Wrap a smolagents agent as an Agentrial-compatible agent.
@@ -183,6 +183,10 @@ def wrap_smolagent(
     Example:
         from smolagents import ToolCallingAgent, HfApiModel
         agent = ToolCallingAgent(tools=[...], model=HfApiModel())
-        agent_fn = wrap_smolagent(agent)
+        agent_fn = wrap_smolagents_agent(agent)
     """
     return SmolAgentsAdapter(agent)
+
+
+# Backward-compatible alias
+wrap_smolagent = wrap_smolagents_agent

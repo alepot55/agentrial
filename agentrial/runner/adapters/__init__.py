@@ -21,7 +21,8 @@ __all__ = [
     # OpenAI Agents SDK
     "wrap_openai_agent",
     # smolagents (Hugging Face)
-    "wrap_smolagent",
+    "wrap_smolagents_agent",
+    "wrap_smolagent",  # backward-compatible alias
     # Pricing
     "MODEL_PRICING",
     "calculate_cost",
@@ -36,6 +37,7 @@ def __getattr__(name: str):  # noqa: ANN001
         "wrap_autogen_agent": "agentrial.runner.adapters.autogen",
         "wrap_pydantic_ai_agent": "agentrial.runner.adapters.pydantic_ai",
         "wrap_openai_agent": "agentrial.runner.adapters.openai_agents",
+        "wrap_smolagents_agent": "agentrial.runner.adapters.smolagents",
         "wrap_smolagent": "agentrial.runner.adapters.smolagents",
     }
 

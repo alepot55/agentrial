@@ -9,6 +9,7 @@ from typing import Any
 
 from scipy import stats
 
+from agentrial.metrics.statistical import benjamini_hochberg_correction
 from agentrial.types import TrialResult
 
 
@@ -152,13 +153,23 @@ def attribute_failures(trials: list[TrialResult]) -> dict[str, Any]:
         div = compute_divergence(successful, failed, i)
         step_divergences.append(div)
 
-    # Find step with lowest p-value (most significant divergence)
-    significant_steps = [d for d in step_divergences if d["p_value"] < 0.1]
+    # Apply Benjamini-Hochberg correction for multiple testing
+    raw_p_values = [d["p_value"] for d in step_divergences]
+    significant_flags, adjusted_p_values = benjamini_hochberg_correction(raw_p_values, alpha=0.05)
+
+    for i, div in enumerate(step_divergences):
+        div["raw_p_value"] = div["p_value"]
+        div["p_value"] = adjusted_p_values[i]
+        div["significant"] = significant_flags[i]
+
+    # Find step with lowest adjusted p-value (most significant divergence)
+    significant_steps = [d for d in step_divergences if d["significant"]]
 
     if not significant_steps:
         most_likely_step = None
         recommendation = (
-            "No single step shows significant divergence. "
+            "No single step shows significant divergence after "
+            "Benjamini-Hochberg correction. "
             "Failures may be due to cumulative errors or random variation."
         )
     else:
@@ -176,7 +187,7 @@ def attribute_failures(trials: list[TrialResult]) -> dict[str, Any]:
 
         recommendation = (
             f"Step {most_likely_step} shows {significance} divergence "
-            f"(p={most_likely['p_value']:.3f}). "
+            f"(adjusted p={most_likely['p_value']:.3f}). "
             f"Successful runs typically use '{success_action}', "
             f"while failed runs use '{fail_action}'."
         )

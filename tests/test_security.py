@@ -430,6 +430,20 @@ class TestScanMCPConfig:
         with pytest.raises(ValueError, match="Either config_path or config"):
             scan_mcp_config()
 
+    def test_malformed_json_raises_value_error(self) -> None:
+        """Malformed JSON should raise ValueError with clear message."""
+        import pytest
+
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as f:
+            # Write invalid JSON (trailing comma)
+            f.write('{"mcpServers": {"s": {"tools": [],}}}')
+            f.flush()
+
+            with pytest.raises(ValueError, match="Malformed JSON"):
+                scan_mcp_config(config_path=f.name)
+
     def test_full_scan_with_multiple_issues(self) -> None:
         config = {
             "mcpServers": {
@@ -462,3 +476,44 @@ class TestScanMCPConfig:
         categories = {f.category for f in result.findings}
         # Should detect multiple issue types
         assert len(categories) >= 2
+
+    def test_empty_config_not_10(self) -> None:
+        """Empty config should not get a perfect 10/10 score (M6)."""
+        result = scan_mcp_config(config={})
+        assert result.servers_scanned == 0
+        assert any("No servers found" in f.title for f in result.findings)
+
+    def test_non_dict_server_config(self) -> None:
+        """Non-dict server config should not crash (M4)."""
+        config = {
+            "mcpServers": {
+                "broken": "not a dict",
+                "valid": {"tools": [_tool("ok_tool", "ok")]},
+            },
+        }
+        result = scan_mcp_config(config=config)
+        assert any("not a dict" in f.title for f in result.findings)
+        # The valid server should still be scanned
+        assert result.tools_scanned == 1
+
+    def test_non_dict_tool_entry(self) -> None:
+        """Non-dict tool entries should not crash (M4)."""
+        config = {
+            "mcpServers": {
+                "s": {"tools": ["not_a_dict", _tool("ok", "ok")]},
+            },
+        }
+        result = scan_mcp_config(config=config)
+        assert any("Non-dict tool" in f.title for f in result.findings)
+        assert result.tools_scanned == 1  # Only the valid tool counted
+
+    def test_non_dict_env(self) -> None:
+        """Non-dict env should not crash (M4)."""
+        config = {
+            "mcpServers": {
+                "s": {"env": "not_a_dict", "tools": [_tool("ok", "ok")]},
+            },
+        }
+        result = scan_mcp_config(config=config)
+        # Should not crash, just skip env checking
+        assert result.tools_scanned == 1
