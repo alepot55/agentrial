@@ -3,8 +3,14 @@
   "displayName": "Agentrial",
   "description": "Statistical evaluation of AI agents — inline results, flamegraphs, and snapshot regression detection",
   "version": "0.1.0",
-  "publisher": "agentrial",
+  "publisher": "alepot55",
   "license": "MIT",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alepot55/agentrial"
+  },
+  "homepage": "https://github.com/alepot55/agentrial",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -65,6 +71,11 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically refresh results when test files change"
+        },
+        "agentrial.defaultThreshold": {
+          "type": "number",
+          "default": 0.85,
+          "description": "Minimum pass rate to consider a test case as passed (0-1)"
         }
       }
     },

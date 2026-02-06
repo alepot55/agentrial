@@ -36,9 +36,10 @@ export class ResultsTreeProvider implements vscode.TreeDataProvider<ResultItem> 
             ];
 
             for (const caseResult of this.currentResult.results || []) {
+                const threshold = vscode.workspace.getConfiguration('agentrial').get<number>('defaultThreshold', 0.85);
                 items.push(new ResultItem(
                     caseResult.name,
-                    caseResult.pass_rate >= 0.85 ? 'passed' : 'failed',
+                    caseResult.pass_rate >= threshold ? 'passed' : 'failed',
                     vscode.TreeItemCollapsibleState.Collapsed,
                     caseResult,
                 ));
