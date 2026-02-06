@@ -1,12 +1,14 @@
 <p align="center">
   <h1 align="center">agentrial</h1>
   <p align="center">
-    <strong>The pytest for AI agents. Statistical evaluation with confidence intervals and failure attribution.</strong>
+    <strong>The pytest for AI agents. Run your agent 100 times, get confidence intervals instead of anecdotes.</strong>
   </p>
   <p align="center">
     <a href="https://pypi.org/project/agentrial/"><img alt="PyPI" src="https://img.shields.io/pypi/v/agentrial?color=blue"></a>
     <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
     <a href="https://www.python.org/downloads/"><img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11+-blue.svg"></a>
+    <a href="https://github.com/alepot55/agentrial/actions"><img alt="Tests" src="https://img.shields.io/badge/tests-438%20passed-brightgreen"></a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=alepot55.agentrial"><img alt="VS Code" src="https://img.shields.io/badge/VS%20Code-marketplace-blue"></a>
   </p>
 </p>
 
@@ -27,7 +29,7 @@ That's it. You'll see real results in seconds:
 ```
 ╭──────────────────────────────────────────────────────────────────────╮
 │ sample-demo - PASSED                                                 │
-╰───────────────────────────────────────────────────── Threshold: 80% ─╯
+╰───────────────────────────────────────────────────────── Threshold: 80% ─╯
 ┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━┓
 ┃ Test Case        ┃ Pass Rate ┃ 95% CI           ┃ Avg Cost ┃ Avg Latency ┃
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━┩
@@ -45,17 +47,6 @@ Replace `sample_agent.py` with your own agent, update `tests/test_sample.yml`, a
 
 ---
 
-## What it does
-
-- **Multi-trial execution** — Run every test N times automatically. A single pass means nothing for non-deterministic agents.
-- **Wilson confidence intervals** — Statistically accurate pass rates, even with small samples and extreme proportions (0% or 100%).
-- **Step-level failure attribution** — Pinpoints *which tool call* diverges between passing and failing runs using Fisher exact test.
-- **Real cost tracking** — Actual API costs from model metadata, 40+ models supported across Anthropic, OpenAI, Google, Mistral.
-- **Regression detection** — Fisher exact test catches reliability drops between versions. Blocks PRs in CI when quality degrades.
-- **Local-first** — Your data never leaves your machine. No accounts, no SaaS, no telemetry.
-
----
-
 ## Why this exists
 
 Every agent framework ships with benchmarks showing 90%+ accuracy. But run those same agents 100 times on the same task, and you'll see pass rates drop to 60-80% with wide variance. The benchmarks measure one run; production sees thousands.
@@ -64,18 +55,16 @@ No existing tool gives you statistically rigorous, framework-agnostic agent test
 
 ---
 
-## How it compares
+## What it does
 
-| Feature                      | agentrial | Promptfoo | LangSmith | DeepEval | Arize |
-|------------------------------|-----------|-----------|-----------|----------|-------|
-| Multi-trial with CI          | **Free**  | No        | $39/mo    | No       | No    |
-| Confidence intervals         | Yes       | No        | No        | No       | No    |
-| Trajectory step analysis     | Yes       | No        | Partial   | No       | Yes   |
-| Failure attribution          | Yes       | No        | No        | No       | No    |
-| Framework-agnostic (OTel)    | Yes       | Yes       | No        | Yes      | Yes   |
-| Free CI/CD integration       | Yes       | Yes       | No        | No       | No    |
-| Local-first (no data leaves) | Yes       | Yes       | No        | No       | No    |
-| Cost-per-correct-answer      | Yes       | No        | No        | No       | No    |
+- **Multi-trial execution** — Run every test N times automatically. A single pass means nothing for non-deterministic agents.
+- **Wilson confidence intervals** — Statistically accurate pass rates, even with small samples and extreme proportions (0% or 100%).
+- **Step-level failure attribution** — Pinpoints *which tool call* diverges between passing and failing runs using Fisher exact test.
+- **Real cost tracking** — Actual API costs from model metadata, 45+ models supported across Anthropic, OpenAI, Google, Mistral, Meta, DeepSeek.
+- **Regression detection** — Fisher exact test catches reliability drops between versions. Blocks PRs in CI when quality degrades.
+- **Local-first** — Your data never leaves your machine. No accounts, no SaaS, no telemetry.
+- **Agent Reliability Score** — A single 0-100 composite metric that combines accuracy, consistency, cost efficiency, latency, trajectory quality, and failure recovery. Weighted scoring with transparent breakdown — one number to track across releases.
+- **Production monitoring** — Deploy `agentrial monitor` as a cron job or sidecar. CUSUM and Page-Hinkley detectors catch drift in pass rate, cost, and latency. Kolmogorov-Smirnov test detects distribution shifts. Alerts before users notice.
 
 ---
 
@@ -140,7 +129,7 @@ step_expectations:
 agentrial auto-discovers test files:
 
 ```bash
-agentrial run tests/          # Finds test_*.yml, test_*.yaml, test_*.py
+agentrial run tests/          # Finds test_*.yml, test_*.yaml
 agentrial run agentrial.yml   # Run a specific file
 ```
 
@@ -232,47 +221,6 @@ assert e.passed()
 
 ---
 
-## CLI Reference
-
-```bash
-agentrial init                          # Create sample project (ready to run)
-agentrial run                           # Run all tests in current directory
-agentrial run tests/                    # Run tests in specific directory
-agentrial run --trials 20 --threshold 0.9  # Override settings
-agentrial run -o results.json           # Export JSON report
-agentrial run --json                    # JSON to stdout
-agentrial run --flamegraph              # Show trajectory flame graphs
-agentrial run --html flamegraph.html    # Export flame graph as HTML
-agentrial run --judge                   # Enable LLM-as-Judge evaluation
-agentrial run --update-snapshots        # Save snapshot baseline
-agentrial compare results.json -b baseline.json  # Regression detection
-agentrial baseline results.json         # Save baseline
-agentrial config                        # Show configuration
-agentrial snapshot update               # Run and save snapshot
-agentrial snapshot check                # Compare against snapshot
-agentrial security scan --mcp-config c.json  # MCP security scan
-agentrial pareto --models m1,m2,m3      # Pareto frontier analysis
-agentrial prompt track prompt.txt       # Track prompt version
-agentrial prompt diff v1 v2             # Diff prompt versions
-agentrial prompt list                   # List prompt versions
-agentrial monitor --baseline snap.json  # Configure drift monitoring
-agentrial dashboard                     # Launch web dashboard
-```
-
-| Flag | Short | Description | Default |
-|---|---|---|---|
-| `--config` | `-c` | Config file path | `agentrial.yml` |
-| `--trials` | `-n` | Trials per test case | `10` |
-| `--threshold` | `-t` | Min pass rate (0-1) | `0.85` |
-| `--output` | `-o` | JSON output path | — |
-| `--json` | | JSON to stdout | `false` |
-| `--flamegraph` | | Show trajectory flame graphs | `false` |
-| `--html` | | Export flame graph HTML | — |
-| `--judge` | | Enable LLM-as-Judge | `false` |
-| `--update-snapshots` | | Save as snapshot baseline | `false` |
-
----
-
 ## CI/CD Integration
 
 ### GitHub Actions
@@ -311,6 +259,120 @@ Fisher's exact test (p < 0.05) detects statistically significant regressions. Ex
 
 ---
 
+## Advanced features
+
+### Trajectory flame graphs
+
+Visualize agent execution paths across trials. Identify where passing and failing runs diverge.
+
+```bash
+agentrial run --flamegraph          # Terminal visualization
+agentrial run --flamegraph --html flamegraph.html  # Interactive HTML export
+```
+
+### LLM-as-Judge
+
+Use a second LLM to evaluate response quality with calibrated scoring.
+
+```bash
+agentrial run --judge               # Add judge evaluation
+```
+
+Implements Krippendorff's alpha for inter-rater reliability and t-distribution CI for score estimates. Calibration protocol ensures judge consistency before scoring.
+
+### Snapshot testing
+
+Capture baseline behavior and detect regressions automatically.
+
+```bash
+agentrial snapshot update           # Save current behavior as baseline
+agentrial snapshot check            # Compare against baseline
+```
+
+Uses Fisher exact test on pass rates and Mann-Whitney U on cost/latency, with Benjamini-Hochberg correction across all comparisons.
+
+### MCP security scanner
+
+Audit MCP server configurations for 6 vulnerability classes: prompt injection, tool shadowing, data exfiltration, permission escalation, rug pull, and configuration weakness.
+
+```bash
+agentrial security scan --mcp-config servers.json
+```
+
+### Multi-agent evaluation
+
+Evaluate multi-agent systems with delegation accuracy, handoff fidelity, redundancy rate, and cascade failure metrics.
+
+### Pareto frontier analysis
+
+Find the optimal cost-accuracy trade-off across models.
+
+```bash
+agentrial pareto --models claude-3-haiku,gpt-4o-mini,gemini-flash
+```
+
+### Prompt version control
+
+Track, diff, and manage prompt versions with statistical comparison between versions.
+
+```bash
+agentrial prompt track prompts/v2.txt
+agentrial prompt diff v1 v2
+agentrial prompt list
+```
+
+### Agent Reliability Score
+
+A composite 0-100 metric combining 6 weighted components: accuracy (40%), consistency (20%), cost efficiency (10%), latency (10%), trajectory quality (10%), and recovery (10%).
+
+```bash
+agentrial ars results.json
+agentrial ars results.json --cost-ceiling 0.5
+```
+
+### Benchmark registry
+
+Publish evaluation results as verifiable, shareable benchmark files with SHA-256 integrity checksums.
+
+```bash
+agentrial publish results.json --agent-name my-agent --agent-version 1.0.0
+agentrial verify --agent-name my-agent --agent-version 1.0.0 --suite-name my-suite
+```
+
+### Eval packs
+
+Domain-specific evaluation packages distributed as Python packages via entry points. Install a pack, get specialized test suites and evaluators.
+
+```bash
+agentrial packs list               # Show installed packs
+```
+
+### Dashboard
+
+Local FastAPI dashboard for browsing results, comparing runs, and tracking trends.
+
+```bash
+agentrial dashboard                # Start at http://localhost:8080
+```
+
+---
+
+## VS Code extension
+
+Browse test suites, run evaluations, view flame graphs, and compare snapshots — all from your editor.
+
+Install from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=alepot55.agentrial) or search "agentrial" in VS Code extensions.
+
+Features:
+- Suite explorer sidebar with test case tree
+- Run suites and individual test cases with one click
+- Interactive trajectory flame graph visualization
+- Snapshot comparison for regression detection
+- MCP security scan integration
+- Auto-refresh on YAML file changes
+
+---
+
 ## Statistical Methods
 
 agentrial uses real statistical tests, not simple averages.
@@ -322,6 +384,9 @@ agentrial uses real statistical tests, not simple averages.
 | **Fisher exact test** | Regression detection — compares pass rates between two runs (p < 0.05) |
 | **Mann-Whitney U test** | Compares cost/latency distributions between versions |
 | **Benjamini-Hochberg** | Controls false discovery rate when comparing multiple metrics |
+| **CUSUM / Page-Hinkley** | Sequential change-point detection for production monitoring |
+| **Kolmogorov-Smirnov** | Distribution shift detection for cost and latency |
+| **Krippendorff's alpha** | Inter-rater reliability for LLM-as-Judge with t-distribution CI |
 
 ### Failure attribution
 
@@ -333,53 +398,59 @@ When tests fail, agentrial analyzes trajectory divergence:
 
 ---
 
-## Architecture
+## CLI Reference
 
+```bash
+agentrial init                              # Scaffold sample project
+agentrial run                               # Run all tests
+agentrial run tests/ --trials 20            # Custom trials
+agentrial run -o results.json               # JSON export
+agentrial run --flamegraph                  # Trajectory flame graphs
+agentrial run --judge                       # LLM-as-Judge evaluation
+agentrial compare results.json -b base.json # Regression detection
+agentrial baseline results.json             # Save baseline
+agentrial snapshot update / check           # Snapshot testing
+agentrial security scan --mcp-config c.json # MCP security scan
+agentrial pareto --models m1,m2,m3          # Cost-accuracy Pareto frontier
+agentrial prompt track/diff/list            # Prompt version control
+agentrial monitor --baseline snap.json      # Production drift detection
+agentrial ars results.json                  # Agent Reliability Score
+agentrial publish results.json --agent-name me --agent-version 1.0  # Publish benchmark
+agentrial verify --agent-name me --agent-version 1.0 --suite-name s # Verify integrity
+agentrial packs list                        # List installed eval packs
+agentrial dashboard                         # Start local dashboard
+agentrial config                            # Show configuration
 ```
-agentrial/
-├── cli.py                  # Click CLI — run, compare, baseline, config, init, etc.
-├── config.py               # YAML config loading and test file discovery
-├── types.py                # AgentInput, AgentOutput, TestCase, Suite, etc.
-├── snapshots.py            # Statistical snapshot testing and comparison
-├── pareto.py               # Cost-accuracy Pareto frontier analysis
-├── prompts.py              # Prompt version control (track, diff, list)
-├── monitor.py              # Production drift detection (CUSUM, Page-Hinkley, KS)
-├── pytest_plugin.py        # @agent_test decorator for pytest integration
-├── runner/
-│   ├── engine.py           # MultiTrialEngine — orchestrates N trials per test
-│   ├── trajectory.py       # TrajectoryRecorder — captures steps, tokens, cost
-│   ├── otel.py             # OpenTelemetry span capture for any framework
-│   └── adapters/
-│       ├── base.py         # BaseAdapter protocol + FunctionAdapter
-│       ├── langgraph.py    # LangGraph adapter (callbacks + trajectory)
-│       ├── crewai.py       # CrewAI adapter
-│       ├── autogen.py      # AutoGen adapter (v0.4+ and legacy)
-│       ├── pydantic_ai.py  # Pydantic AI adapter
-│       ├── openai_agents.py # OpenAI Agents SDK adapter
-│       ├── smolagents.py   # Hugging Face smolagents adapter
-│       └── pricing.py      # Model pricing for 40+ LLMs
-├── evaluators/
-│   ├── exact.py            # contains, regex, tool_called, exact_match
-│   ├── expect.py           # Fluent assertion API
-│   ├── functional.py       # Custom check functions, range checks
-│   ├── llm_judge.py        # Calibrated LLM-as-Judge evaluator
-│   ├── multi_agent.py      # Multi-agent evaluation
-│   └── step_eval.py        # Per-step and trajectory evaluation
-├── metrics/
-│   ├── basic.py            # Pass rate, cost, latency, token efficiency
-│   ├── statistical.py      # Wilson CI, bootstrap, Fisher, Mann-Whitney, BH
-│   └── trajectory.py       # Failure attribution via divergence analysis
-├── reporters/
-│   ├── terminal.py         # Rich terminal output
-│   ├── json_report.py      # JSON export, load, comparison
-│   └── flamegraph.py       # Trajectory flame graphs (terminal + HTML)
-├── security/
-│   └── scanner.py          # MCP security scanner (5 vulnerability classes)
-└── dashboard/
-    ├── app.py              # FastAPI cloud dashboard
-    ├── models.py           # Dashboard data models
-    └── store.py            # Persistent storage backend
-```
+
+| Flag | Short | Description | Default |
+|---|---|---|---|
+| `--config` | `-c` | Config file path | `agentrial.yml` |
+| `--trials` | `-n` | Trials per test case | `10` |
+| `--threshold` | `-t` | Min pass rate (0-1) | `0.85` |
+| `--output` | `-o` | JSON output path | — |
+| `--json` | | JSON to stdout | `false` |
+| `--flamegraph` | | Show trajectory flame graphs | `false` |
+| `--html` | | Export flame graph HTML | — |
+| `--judge` | | Enable LLM-as-Judge | `false` |
+| `--update-snapshots` | | Save as snapshot baseline | `false` |
+
+---
+
+## How it compares
+
+| | agentrial | Promptfoo | LangSmith | DeepEval | Arize Phoenix |
+|---|---|---|---|---|---|
+| Multi-trial with CI | **Free** | — | $39/mo | — | — |
+| Confidence intervals | Wilson CI | — | — | — | — |
+| Step-level failure attribution | Fisher exact | — | — | — | Partial |
+| Framework-agnostic | 6 adapters + OTel | Yes | LangChain only | Yes | Yes |
+| Cost-per-correct-answer | Yes | — | — | — | — |
+| LLM-as-Judge with calibration | Krippendorff α | — | Yes | Yes | — |
+| Composite reliability score | ARS (0-100) | — | — | — | — |
+| MCP security scanning | 6 vuln classes | — | — | — | — |
+| Production drift detection | CUSUM + PH + KS | — | — | — | Partial |
+| VS Code extension | Yes | — | — | — | — |
+| Local-first | Yes | Yes | No | No | Self-host option |
 
 ---
 
@@ -400,10 +471,12 @@ agentrial/
 
 | Provider | Models |
 |---|---|
-| **Anthropic** | Claude 3 Haiku/Sonnet/Opus, Claude 3.5, Claude 4 |
-| **OpenAI** | GPT-4o, GPT-4o-mini, GPT-4 Turbo, GPT-3.5 Turbo |
-| **Google** | Gemini 1.5 Pro/Flash, Gemini 1.0 Pro |
-| **Mistral** | Large, Medium, Small |
+| **Anthropic** | Claude 3 Haiku/Sonnet/Opus, Claude 3.5, Claude Sonnet 4.5, Claude Opus 4 |
+| **OpenAI** | GPT-4o, GPT-4o-mini, GPT-4 Turbo, GPT-3.5 Turbo, o1, o3-mini |
+| **Google** | Gemini 2.0 Flash, Gemini 1.5 Pro/Flash, Gemini 1.0 Pro |
+| **Mistral** | Large, Medium, Small, Codestral, Pixtral |
+| **Meta** | Llama 3.3 70B, Llama 3.1 405B/70B |
+| **DeepSeek** | DeepSeek Chat, DeepSeek Reasoner |
 
 ---
 
@@ -413,7 +486,7 @@ agentrial/
 git clone https://github.com/alepot55/agentrial.git
 cd agentrial
 pip install -e ".[dev]"
-pytest
+pytest                    # 438 tests
 ruff check .
 mypy agentrial/
 ```
