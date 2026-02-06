@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from agentrial.metrics.statistical import (
+    benjamini_hochberg_correction,
     fisher_exact_test,
     mann_whitney_u_test,
 )
@@ -184,7 +185,8 @@ def compare_with_snapshot(
     """Compare current results against a snapshot baseline.
 
     Uses Fisher exact test for pass rate and Mann-Whitney U for
-    cost/latency distributions.
+    cost/latency distributions. Applies Benjamini-Hochberg correction
+    across all p-values to control false discovery rate.
 
     Args:
         current: Current suite results.
@@ -197,6 +199,8 @@ def compare_with_snapshot(
     baseline_cases = {c["name"]: c for c in snapshot.get("cases", [])}
     case_comparisons = []
 
+    # First pass: compute raw p-values for all case/metric comparisons
+    raw_comparisons: list[tuple[int, str, float]] = []  # (case_idx, metric, p_value)
     for result in current.results:
         baseline = baseline_cases.get(result.test_case.name)
         if baseline is None:
@@ -209,8 +213,38 @@ def compare_with_snapshot(
             )
             continue
 
-        comp = _compare_case(result, baseline, alpha)
+        comp = _compare_case_raw(result, baseline)
         case_comparisons.append(comp)
+        case_idx = len(case_comparisons) - 1
+        if comp.pass_rate_p is not None:
+            raw_comparisons.append((case_idx, "pass_rate", comp.pass_rate_p))
+        if comp.cost_p is not None:
+            raw_comparisons.append((case_idx, "cost", comp.cost_p))
+        if comp.latency_p is not None:
+            raw_comparisons.append((case_idx, "latency", comp.latency_p))
+
+    # Apply Benjamini-Hochberg correction across ALL p-values
+    if raw_comparisons:
+        all_p_values = [p for _, _, p in raw_comparisons]
+        significant_flags, adjusted_p_values = benjamini_hochberg_correction(
+            all_p_values, alpha=alpha
+        )
+
+        # Write adjusted p-values back and determine status
+        for i, (case_idx, metric, _raw_p) in enumerate(raw_comparisons):
+            comp = case_comparisons[case_idx]
+            if metric == "pass_rate":
+                comp.pass_rate_p = adjusted_p_values[i]
+            elif metric == "cost":
+                comp.cost_p = adjusted_p_values[i]
+            elif metric == "latency":
+                comp.latency_p = adjusted_p_values[i]
+
+        # Now determine status using corrected p-values
+        for comp in case_comparisons:
+            if comp.status in ("new", "removed"):
+                continue
+            comp.status = _determine_status(comp, alpha)
 
     # Check for removed cases
     current_names = {r.test_case.name for r in current.results}
@@ -235,12 +269,11 @@ def compare_with_snapshot(
     )
 
 
-def _compare_case(
+def _compare_case_raw(
     current: EvalResult,
     baseline: dict[str, Any],
-    alpha: float,
 ) -> CaseComparison:
-    """Compare a single test case against its snapshot."""
+    """Compare a single test case, computing raw p-values without status."""
     metrics = baseline.get("metrics", {})
     baseline_pass_rate = metrics.get("pass_rate", {}).get("mean", 0.0)
     baseline_trials = baseline.get("trials", 10)
@@ -274,35 +307,10 @@ def _compare_case(
         _, latency_p = mann_whitney_u_test(current_latencies, baseline_latencies)
         latency_delta = current.mean_latency_ms - metrics["latency"]["mean"]
 
-    # Determine status
-    is_pass_rate_regression = pass_rate_delta < 0 and pass_rate_p < alpha
-    is_cost_regression = (
-        cost_delta is not None
-        and cost_p is not None
-        and cost_delta > 0
-        and cost_p < alpha
-    )
-    is_latency_regression = (
-        latency_delta is not None
-        and latency_p is not None
-        and latency_delta > 0
-        and latency_p < alpha
-    )
-
-    if is_pass_rate_regression:
-        status = "regression"
-    elif cost_delta is not None and is_cost_regression:
-        status = "cost_regression"
-    elif latency_delta is not None and is_latency_regression:
-        status = "latency_regression"
-    elif pass_rate_delta > 0 and pass_rate_p < alpha:
-        status = "improved"
-    else:
-        status = "no_change"
-
+    # Status is "pending" — will be determined after BH correction
     return CaseComparison(
         name=current.test_case.name,
-        status=status,
+        status="pending",
         current_pass_rate=current.pass_rate,
         baseline_pass_rate=baseline_pass_rate,
         pass_rate_delta=pass_rate_delta,
@@ -312,6 +320,44 @@ def _compare_case(
         latency_delta=latency_delta,
         latency_p=latency_p,
     )
+
+
+def _determine_status(comp: CaseComparison, alpha: float) -> str:
+    """Determine comparison status using BH-corrected p-values."""
+    is_pass_rate_regression = (
+        comp.pass_rate_delta is not None
+        and comp.pass_rate_p is not None
+        and comp.pass_rate_delta < 0
+        and comp.pass_rate_p < alpha
+    )
+    is_cost_regression = (
+        comp.cost_delta is not None
+        and comp.cost_p is not None
+        and comp.cost_delta > 0
+        and comp.cost_p < alpha
+    )
+    is_latency_regression = (
+        comp.latency_delta is not None
+        and comp.latency_p is not None
+        and comp.latency_delta > 0
+        and comp.latency_p < alpha
+    )
+
+    if is_pass_rate_regression:
+        return "regression"
+    elif is_cost_regression:
+        return "cost_regression"
+    elif is_latency_regression:
+        return "latency_regression"
+    elif (
+        comp.pass_rate_delta is not None
+        and comp.pass_rate_p is not None
+        and comp.pass_rate_delta > 0
+        and comp.pass_rate_p < alpha
+    ):
+        return "improved"
+    else:
+        return "no_change"
 
 
 class CaseComparison:

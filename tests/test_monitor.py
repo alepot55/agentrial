@@ -112,6 +112,59 @@ class TestCUSUMDetector:
         assert detector.s_high == 0.0
         assert detector.s_low == 0.0
 
+    def test_warmup_no_alert_then_drift_detected(self) -> None:
+        """30 Bernoulli(0.85) warmup, no alert. Then 30 Bernoulli(0.4), drift."""
+        import random
+
+        random.seed(42)
+        detector = CUSUMDetector(
+            target=0.85, threshold=3.0, drift_magnitude=0.2, min_observations=30
+        )
+
+        # Warmup phase: 30 Bernoulli(0.85) draws
+        for _ in range(30):
+            val = 1.0 if random.random() < 0.85 else 0.0
+            alert = detector.update(val)
+            assert alert is None, "CUSUM should not alert during warmup"
+
+        # Post-warmup: 30 Bernoulli(0.4) draws — strong downward drift
+        alerts = []
+        for _ in range(30):
+            val = 1.0 if random.random() < 0.4 else 0.0
+            alert = detector.update(val)
+            if alert:
+                alerts.append(alert)
+
+        assert len(alerts) > 0, "CUSUM should detect drift after warmup"
+        assert alerts[0].method == "cusum"
+        assert "downward" in alerts[0].message
+
+    def test_warmup_false_alarm_rate(self) -> None:
+        """200 Bernoulli(0.85) observations. CUSUM must never signal drift."""
+        import random
+
+        random.seed(99)
+        detector = CUSUMDetector(
+            target=0.85, threshold=5.0, drift_magnitude=0.1, min_observations=30
+        )
+
+        for _ in range(200):
+            val = 1.0 if random.random() < 0.85 else 0.0
+            alert = detector.update(val)
+            assert alert is None, (
+                f"CUSUM false alarm at observation {detector.count}"
+            )
+
+    def test_drift_detected_property(self) -> None:
+        """Test the drift_detected property."""
+        detector = CUSUMDetector(
+            target=0.85, threshold=5.0, min_observations=5
+        )
+        # During warmup, no drift
+        for _ in range(5):
+            detector.update(1.0)
+        assert not detector.drift_detected
+
 
 class TestPageHinkleyDetector:
     """Tests for Page-Hinkley detector."""
@@ -279,6 +332,31 @@ class TestDriftDetector:
 
         latency_alerts = [a for a in all_alerts if a.metric == "latency"]
         assert len(latency_alerts) > 0
+
+    def test_page_hinkley_wired_in(self) -> None:
+        """PageHinkley is called by observe() and can detect drift."""
+        detector = DriftDetector(
+            baseline_pass_rate=0.5,
+            window_size=500,  # large to avoid sliding window alerts
+        )
+        # Override PH with sensitive settings — low threshold, short warmup
+        detector.page_hinkley = PageHinkleyDetector(
+            threshold=5.0, alpha=0.001, min_observations=5
+        )
+
+        all_alerts = []
+        # Stable low phase — all fail (value=0.0)
+        for _ in range(10):
+            alerts = detector.observe(Observation(passed=False))
+            all_alerts.extend(alerts)
+
+        # Shift to all pass (value=1.0) — clear upward change point
+        for _ in range(100):
+            alerts = detector.observe(Observation(passed=True))
+            all_alerts.extend(alerts)
+
+        ph_alerts = [a for a in all_alerts if a.method == "page_hinkley"]
+        assert len(ph_alerts) > 0, "PageHinkley should detect drift via observe()"
 
     def test_reset(self) -> None:
         detector = DriftDetector(baseline_pass_rate=0.8)

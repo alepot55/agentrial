@@ -71,6 +71,7 @@ class CUSUMDetector:
         target: float,
         threshold: float = 5.0,
         drift_magnitude: float = 0.1,
+        min_observations: int = 30,
     ) -> None:
         """Initialize CUSUM detector.
 
@@ -78,13 +79,23 @@ class CUSUMDetector:
             target: Expected (baseline) value of the metric.
             threshold: Decision threshold h (higher = less sensitive).
             drift_magnitude: Minimum shift to detect (delta/2 in CUSUM).
+            min_observations: Minimum observations before detecting drift.
+                During warmup, observations are counted but drift is not
+                signaled. After warmup, cumulative sums are reset.
         """
         self.target = target
         self.threshold = threshold
         self.allowance = drift_magnitude / 2  # k in CUSUM formula
+        self.min_observations = min_observations
         self.s_high = 0.0  # Upper CUSUM
         self.s_low = 0.0  # Lower CUSUM
         self.count = 0
+        self._warmup_done = False
+
+    @property
+    def drift_detected(self) -> bool:
+        """Whether either CUSUM statistic exceeds the threshold."""
+        return self.s_high > self.threshold or self.s_low > self.threshold
 
     def update(self, value: float) -> DriftAlert | None:
         """Update with a new observation.
@@ -96,6 +107,15 @@ class CUSUMDetector:
             DriftAlert if drift detected, None otherwise.
         """
         self.count += 1
+
+        # During warmup: accumulate count but don't detect
+        if not self._warmup_done:
+            if self.count >= self.min_observations:
+                self._warmup_done = True
+                # Reset cumulative sums after warmup
+                self.s_high = 0.0
+                self.s_low = 0.0
+            return None
 
         # Update cumulative sums
         self.s_high = max(0, self.s_high + (value - self.target) - self.allowance)
@@ -141,6 +161,7 @@ class CUSUMDetector:
         self.s_high = 0.0
         self.s_low = 0.0
         self.count = 0
+        self._warmup_done = False
 
 
 class PageHinkleyDetector:
@@ -488,6 +509,11 @@ class DriftDetector:
         cusum_alert = self.cusum.update(value)
         if cusum_alert:
             alerts.append(cusum_alert)
+
+        ph_alert = self.page_hinkley.update(value)
+        if ph_alert:
+            ph_alert.metric = "pass_rate"
+            alerts.append(ph_alert)
 
         window_alert = self.sliding_window.update(obs.passed)
         if window_alert:

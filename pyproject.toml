@@ -52,6 +52,38 @@ langgraph = [
     "langgraph>=0.2.0",
     "langchain-core>=0.2.0",
 ]
+crewai = [
+    "crewai>=0.1.0",
+]
+autogen = [
+    "autogen-agentchat>=0.4.0",
+]
+pydantic-ai = [
+    "pydantic-ai>=0.1.0",
+]
+openai-agents = [
+    "openai-agents>=0.1.0",
+]
+smolagents = [
+    "smolagents>=0.1.0",
+]
+judge = [
+    "litellm>=1.0.0",
+]
+dashboard = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.20.0",
+]
+all = [
+    "agentrial[langgraph]",
+    "agentrial[crewai]",
+    "agentrial[autogen]",
+    "agentrial[pydantic-ai]",
+    "agentrial[openai-agents]",
+    "agentrial[smolagents]",
+    "agentrial[judge]",
+    "agentrial[dashboard]",
+]
 
 [project.scripts]
 agentrial = "agentrial.cli:main"
